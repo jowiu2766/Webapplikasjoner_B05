@@ -1,0 +1,29 @@
+# Kjører på hver push til main og på hver pull request.
+# Feiler den, er noe rødt: typesjekk eller tester. Se loggen i Actions-fanen.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      # npm ci installerer nøyaktig det som står i package-lock.json
+      - run: npm ci
+
+      - name: Typesjekk
+        run: npm run lint
+
+      # Dekningen skrives i loggen. Kravet ved innlevering er minst 50 %.
+      - name: Tester med dekning
+        run: npm run test:coverage
