@@ -1,0 +1,49 @@
+# Deployer main til Cloudflare Workers. Oppskrift for kontoen, databasen og
+# hemmelighetene står i docs/hosting.md.
+#
+# Jobben hopper over seg selv til CLOUDFLARE_API_TOKEN og CLOUDFLARE_ACCOUNT_ID
+# ligger som secrets i repoet. Da er workflowen ufarlig å ha liggende fra dag én.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  # secrets kan ikke leses i en jobbs if-betingelse, bare i steg. Derfor et
+  # lite forsteg som svarer ja eller nei.
+  sjekk:
+    runs-on: ubuntu-latest
+    outputs:
+      klar: ${{ steps.s.outputs.klar }}
+    steps:
+      - id: s
+        run: echo "klar=${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: sjekk
+    if: needs.sjekk.outputs.klar == 'true'
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Bygg
+        run: npm run build
+
+      # Migrasjonene kjøres mot D1 i skyen før ny kode tar over.
+      - name: Migrer databasen
+        run: npx wrangler d1 migrations apply DB --remote
+
+      - name: Deploy
+        run: npx wrangler deploy
