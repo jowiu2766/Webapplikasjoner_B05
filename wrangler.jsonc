@@ -35,7 +35,7 @@
     {
       "binding": "DB",
       "database_name": "fiksa-db",
-      "database_id": "__change_me__",
+      "database_id": "64d45af0-8241-4ffe-a44a-f6b3502c9737",
       "migrations_dir": "drizzle/migrations",
       // Drizzle v1 legger hver migrasjon i sin egen mappe. Uten dette
       // mønsteret finner wrangler ingenting, og sier «No migrations to apply».
