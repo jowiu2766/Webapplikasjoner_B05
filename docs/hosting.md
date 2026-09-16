@@ -4,6 +4,10 @@ Ansvar: Jo. Webappen kjører som en Cloudflare Worker med D1 (SQLite) som databa
 
 Lokalt trengs ingen konto: `npm run dev` bruker en lokal database under `.wrangler/`.
 
+## Status
+
+Satt opp 16. september 2026. Appen ligger på https://fiksa.hiof-b05.workers.dev (kontoens subdomene er `hiof-b05.workers.dev`), databasen heter `fiksa-db` (D1, region EEUR). Kontoen er Jos (joandreaswium@gmail.com), og begge hemmelighetene ligger i GitHub-repoet. `main` deployer automatisk.
+
 ## Engangsoppsett
 
 1. **Cloudflare-konto.** Opprett en gratis konto på cloudflare.com. Noter Account ID (står i høyre marg på dashbordet, og under Workers & Pages).
@@ -23,7 +27,7 @@ Lokalt trengs ingen konto: `npm run dev` bruker en lokal database under `.wrangl
    | `CLOUDFLARE_API_TOKEN` | tokenet fra steg 3 |
    | `CLOUDFLARE_ACCOUNT_ID` | Account ID fra steg 1 |
 
-5. **Første deploy.** Push til `main`, eller kjør workflowen Deploy manuelt fra Actions-fanen (Run workflow). Appen får adressen `https://fiksa.<ditt-subdomene>.workers.dev`. Navnet `fiksa` kommer fra `name` i `wrangler.jsonc`.
+5. **Første deploy.** Åpne Workers & Pages i Cloudflare-dashbordet én gang først. Det registrerer subdomenet `<navn>.workers.dev`; uten det feiler deploy med «You need to register a workers.dev subdomain». Push så til `main`, eller kjør workflowen Deploy manuelt fra Actions-fanen (Run workflow). Appen får adressen `https://fiksa.<ditt-subdomene>.workers.dev`. Navnet `fiksa` kommer fra `name` i `wrangler.jsonc`.
 
 ## Hemmeligheter for selve appen
 
@@ -51,6 +55,7 @@ Lokalt ligger de samme verdiene i `.dev.vars` (gitignorert), se `.dev.vars.examp
 | Problem | Løsning |
 | --- | --- |
 | Deploy-jobben står som «skipped» | Hemmelighetene i steg 4 mangler eller heter noe annet |
+| «You need to register a workers.dev subdomain» | Åpne Workers & Pages i dashbordet én gang, og kjør deploy på nytt |
 | «invalid database id» | `database_id` i `wrangler.jsonc` er ikke byttet ut |
 | Token avvist | Tokenet mangler D1-rettighet, eller er utløpt. Lag nytt |
 | Migrasjon feiler i skyen | Kjør `npm run migrate:prod` lokalt og les feilmeldingen. Migrasjoner endres aldri i ettertid, legg til en ny |
