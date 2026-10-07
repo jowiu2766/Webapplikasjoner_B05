@@ -22,6 +22,19 @@ export const relations = defineRelations(schema, (r) => ({
       optional: false,
     }),
   },
+  cases: {
+    // en sak har en leietaker og en utleier
+    tenant: r.one.users({
+      from: r.cases.tenantId,
+      to: r.users.id,
+      optional: false,
+    }),
+    landlord: r.one.users({
+      from: r.cases.landlordId,
+      to: r.users.id,
+      optional: false,
+    }),
+  },
 }));
 
 export type Relations = typeof relations;
