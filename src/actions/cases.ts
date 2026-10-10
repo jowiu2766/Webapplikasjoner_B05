@@ -9,7 +9,7 @@ export async function createCase(
   category: string,
   priority: string,
   description: string,
-  deadLine: Date,
+  deadLine: string,
 ) {
   const { ctx } = requestInfo;
 

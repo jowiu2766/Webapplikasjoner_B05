@@ -23,10 +23,11 @@ export function NewCaseForm() {
     | "maintenance issue"
     | "complaint"
     | "other"
-  >("other");
+    | "choose"
+  >("choose");
   const [priority, setPriority] = useState<
-    "low" | "medium" | "high" | "severe"
-  >("low");
+    "low" | "medium" | "high" | "severe" | "choose"
+  >("choose");
   const [description, setDescription] = useState("");
   const [deadLine, setDeadLine] = useState(addDays(caseCreated, 7)); // Automatisk 7 dagers deadline fra sak blir sendt inn - må teste denne
   const [error, setError] = useState<string | null>(null);
@@ -39,9 +40,9 @@ export function NewCaseForm() {
       const result = await createCase(
         title,
         category,
-        description,
         priority,
-        deadLine,
+        description,
+        deadLine.toISOString(),
       );
       if (!result.ok) {
         setError(result.error);
@@ -61,12 +62,19 @@ export function NewCaseForm() {
       {/* Title */}
       <textarea
         value={title}
+        id="title"
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Kort forklaring av sak"
       />
       {/* Category */}
-      <label htmlFor={category}>Kategori</label>
-      <select id="category" name="category">
+      <label htmlFor="category">Kategori</label>
+      <select
+        id="category"
+        name="category"
+        value={category}
+        onChange={(e) => setCategory(e.target.value as typeof category)}
+      >
+        <option value="choose">Velg</option>
         <option value="electricity">Elektrisitet</option>
         <option value="pipes">Rør</option>
         <option value="pests">Skadedyr</option>
@@ -76,8 +84,14 @@ export function NewCaseForm() {
         <option value="other">Annet</option>
       </select>
       {/* Priority */}
-      <label htmlFor={priority}>Prioritet</label>
-      <select id="priority" name="priority">
+      <label htmlFor="priority">Prioritet</label>
+      <select
+        id="priority"
+        name="priority"
+        value={priority}
+        onChange={(e) => setPriority(e.target.value as typeof priority)}
+      >
+        <option value="choose">Velg</option>
         <option value="low">Lav</option>
         <option value="medium">Medium</option>
         <option value="high">Høy</option>
@@ -85,11 +99,20 @@ export function NewCaseForm() {
       </select>
       {/* Decription */}
       <textarea
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        value={description}
+        id="description"
+        onChange={(e) => setDescription(e.target.value)}
         placeholder="Forklar detaljert hva saken gjelder"
       />
       {/* Deadline */}
+      <label htmlFor="deadLine">Tidsfrist</label>
+      <input type="date" id="deadLine"></input>
+      {/* Submit button */}
+      <div>
+        <button type="submit" disabled={isPending}>
+          {isPending ? "Sender..." : "Send"}
+        </button>
+      </div>
     </form>
   );
 }

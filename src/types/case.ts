@@ -7,6 +7,7 @@ export const CaseCategory = {
   MAINTENANCE_ISSUE: "maintenance issue",
   COMPLAINT: "complaint",
   OTHER: "other",
+  CHOOSE: "choose",
 } as const;
 
 export const PriorityType = {
@@ -14,6 +15,7 @@ export const PriorityType = {
   MEDIUM: "medium",
   HIGH: "high",
   SEVERE: "severe",
+  CHOOSE: "choose",
 };
 
 export type CaseCategory = (typeof CaseCategory)[keyof typeof CaseCategory];
