@@ -15,6 +15,7 @@ export function Home() {
   return (
     <main className="mx-auto max-w-2xl p-8 font-sans">
       <h1 className="text-3xl font-bold">Fiksa</h1>
+      
       <p className="mt-2 text-slate-600">
         Fiksa samler dialogen mellom leietaker og utleier på ett sted. Startprosjektet virker.
       </p>
@@ -42,6 +43,12 @@ export function Home() {
           Endre teksten i src/app/pages/Home.tsx og se at siden oppdaterer seg.
         </li>
         <li>Trykk på knappen over. Den er en klient-komponent.</li>
+      </ul>
+      <h3>Temp navigation</h3>
+      <ul>
+        <li>
+          <a href="/Screens">Dette rutter til TestStateScreen</a>
+        </li>
       </ul>
     </main>
   );

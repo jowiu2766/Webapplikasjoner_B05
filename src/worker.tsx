@@ -1,8 +1,11 @@
 import { defineApp } from "rwsdk/worker";
-import { render, route } from "rwsdk/router";
+import { layout, render, route } from "rwsdk/router";
 import { Document } from "@/app/Document";
 import { setCommonHeaders } from "@/app/headers";
 import { Home } from "@/app/pages/Home";
+import { AppLayout } from "./app/layouts/AppLayout";
+import { TestStateSceeen } from "@/app/pages/Screens/TestStateScreen";
+
 
 /**
  * Alt som ligger på `ctx` for én forespørsel.
@@ -23,7 +26,12 @@ const app = defineApp([
   ),
 
   // Sider. render(Document, [...]) pakker dem i et helt HTML-dokument.
-  render(Document, [route("/", Home)]),
-]);
+  render(Document,[
+      layout(AppLayout, [
+        route("/", Home),
+        route("/Screens", TestStateSceeen),
+      ])
+    ])
+  ]);
 
 export default { fetch: app.fetch };
