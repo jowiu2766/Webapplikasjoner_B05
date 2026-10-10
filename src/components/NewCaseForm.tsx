@@ -1,6 +1,7 @@
 "use client";
 
 import { createCase } from "@/actions/cases";
+import { Placeholder } from "drizzle-orm";
 import { useState, useTransition } from "react";
 
 // måten jeg har satt opp date må nok endres
@@ -56,8 +57,39 @@ export function NewCaseForm() {
 
   // Mer skal føres inn her
   return (
-    <form>
-      <textarea></textarea>
+    <form onSubmit={onSubmit}>
+      {/* Title */}
+      <textarea
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Kort forklaring av sak"
+      />
+      {/* Category */}
+      <label htmlFor={category}>Kategori</label>
+      <select id="category" name="category">
+        <option value="electricity">Elektrisitet</option>
+        <option value="pipes">Rør</option>
+        <option value="pests">Skadedyr</option>
+        <option value="water damage">Vannskade</option>
+        <option value="maintenance issue">Vedlikehold</option>
+        <option value="complaint">Klage</option>
+        <option value="other">Annet</option>
+      </select>
+      {/* Priority */}
+      <label htmlFor={priority}>Prioritet</label>
+      <select id="priority" name="priority">
+        <option value="low">Lav</option>
+        <option value="medium">Medium</option>
+        <option value="high">Høy</option>
+        <option value="severe">Kritisk</option>
+      </select>
+      {/* Decription */}
+      <textarea
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Forklar detaljert hva saken gjelder"
+      />
+      {/* Deadline */}
     </form>
   );
 }
