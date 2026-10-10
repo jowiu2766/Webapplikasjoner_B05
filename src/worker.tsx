@@ -13,6 +13,7 @@ import { TestStateSceeen } from "@/app/pages/Screens/TestStateScreen";
  * Tom nå. Legger dere til `user` her, blir `ctx.user` typet i hele appen,
  * fordi types/rw.d.ts mater denne typen inn i rwsdk.
  */
+//Expand context to have auythcontext, prevent type errors using xtx.user or xtx.session
 export type AppContext = {};
 
 const app = defineApp([
