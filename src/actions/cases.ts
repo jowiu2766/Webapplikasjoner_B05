@@ -10,6 +10,7 @@ export async function createCase(
   priority: string,
   description: string,
   deadLine: string,
+  files: File[],
 ) {
   const { ctx } = requestInfo;
 

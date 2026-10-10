@@ -30,6 +30,7 @@ export function NewCaseForm() {
   >("choose");
   const [description, setDescription] = useState("");
   const [deadLine, setDeadLine] = useState(addDays(caseCreated, 7)); // Automatisk 7 dagers deadline fra sak blir sendt inn - må teste denne
+  const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -43,6 +44,7 @@ export function NewCaseForm() {
         priority,
         description,
         deadLine.toISOString(),
+        files,
       );
       if (!result.ok) {
         setError(result.error);
@@ -53,10 +55,10 @@ export function NewCaseForm() {
       setDescription("");
       setPriority("low");
       setDeadLine(addDays(new Date(), 7));
+      setFiles([]);
     });
   }
 
-  // Mer skal føres inn her
   return (
     <form onSubmit={onSubmit}>
       {/* Title */}
@@ -106,7 +108,11 @@ export function NewCaseForm() {
       />
       {/* Deadline */}
       <label htmlFor="deadLine">Tidsfrist</label>
-      <input type="date" id="deadLine"></input>
+      <input type="date" name="deadline " id="deadLine" />
+      {/* Files - mulig å laste opp flere filer samtidig, men man må markere dem samtidig når de skal lastes opp. 
+      Hvis ikke erstatter de filene som er lagt til allerede */}
+      <label htmlFor="files">Filer</label>
+      <input type="file" id="files" name="files" multiple />
       {/* Submit button */}
       <div>
         <button type="submit" disabled={isPending}>
