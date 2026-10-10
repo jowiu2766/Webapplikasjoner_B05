@@ -34,7 +34,7 @@
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "dotenv": "17.4.2",
-    "drizzle-orm": "1.0.0-rc.4",
+    "drizzle-orm": "0.45.2",
     "lucide-react": "1.42.0",
     "nanoid": "5.1.16",
     "ohash": "2.0.12",
@@ -48,7 +48,7 @@
     "zod": "4.5.4"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.54.4",
+    "@cloudflare/vite-plugin": "^1.63.1",
     "@cloudflare/workers-types": "5.20260907.1",
     "@playwright/test": "1.63.0",
     "@rolldown/plugin-babel": "0.2.4",
