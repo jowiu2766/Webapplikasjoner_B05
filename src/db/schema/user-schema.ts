@@ -8,9 +8,13 @@ import { relations } from "drizzle-orm";
  */
 export const users = sqliteTable("users", {
   id: int().primaryKey({ autoIncrement: true }),
-  name: text().notNull(),
-  email: text().notNull().unique(),
-  role: text("role", { enum: ["Unauthenticated", "Tenant", "Landlord", "Admin"] })
+  username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
+  role: text("role", { enum: ["Unauthenticated", "Tenant", "Landlord", "Admin"] }).notNull().default("Unauthenticated"),
+  isActive: integer("is_active", {mode: "boolean"}).notNull().default(true),
+  lastLoginAt: integer("last_login_at", {mode: "timestamp"}),
+  createdAt: integer("created_at", {mode:"timestamp"}).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", {mode: "timestamp"}).$onUpdateFn(() => new Date()),
 
 });
 
