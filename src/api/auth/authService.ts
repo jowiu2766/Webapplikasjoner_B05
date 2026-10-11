@@ -9,6 +9,7 @@ import { Errors } from "@/types/errors";
 
 import { createSession, deleteSession } from "@/lib/auth/session";
 import userEvent from "@testing-library/user-event";
+import { LoginDTOSchema, RegisterDTOSchema } from "@/lib/schema/auth-dtos";
 
 export interface AuthService{
     register(credentials: RegisterCredentials,): Promise<Result<{user: SafeUser; session: Session}>>;
@@ -46,7 +47,80 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
         },
         async register(credentials){
          //validate input with DTO schema   
+         try{
+            const validation = RegisterDTOSchema.safeParse(credentials);
+            if(!validation.success){
+                return ResultHandler.failure(`Validation failed: ${validation.error.message}`, Errors.VALIDATION_ERROR);
+            }
+            const {username, email, password} = validation.data;
+
+            //Validate password strenght
+            const passwordValidation = validatePasswordStrength(password);
+            if(!passwordValidation.isValid) return ResultHandler.failure(passwordValidation.errors.join(", "), Errors.VALIDATION_ERROR);
+
+            //Check if email or username already exists - crashes due to simeltnaous requests on AQLisite
+            const existingUserByEmail = await authRepository.findUserByEmail(email);
+            const existingUserByUsername = await authRepository.findUserByUsername(username);
+            
+            if(!existingUserByEmail.success || !existingUserByUsername.success) 
+                return ResultHandler.failure("Error when checking credientials", Errors.INTERNAL_SERVER_ERROR);
+
+            if(existingUserByEmail.data || existingUserByUsername.data) 
+                return ResultHandler.failure("Existing user found", Errors.CONFLICT);
+
+            //hash password
+            const passwordHash = await hashPassword(password);
+            //create user
+            const createUserResult = await authRepository.createUser({
+                username, email, passwordHash, role: "Unauthenticated",
+            });
+            if(!createUserResult.success)
+                return ResultHandler.failure(createUserResult.error, Errors.INTERNAL_SERVER_ERROR);
+
+            const newUser = createUserResult.data;
+
+            //create session
+            const session = await createUserSession(newUser.id);
+            return ResultHandler.sucsess({user: newUser, session});
+         }catch(error){
+            console.error("Registration error:", error);
+            return ResultHandler.failure("Registration failed", Errors.INTERNAL_SERVER_ERROR);
+         }
+
+        },
+
+        async login(credentials){
+            try{
+                //validate input
+                const validation = LoginDTOSchema.safeParse(credentials);
+                if(!validation.success) 
+                    return ResultHandler.failure("Illegal username or password", Errors.UNAUTHORIZED);
+                
+                
+                const{username, password} = validation.data;
+
+                //Find user by username
+                const userResult = await authRepository.findUserByUsername(username);
+                if(!userResult.success) 
+                    return ResultHandler.failure(userResult.error, Errors.INTERNAL_SERVER_ERROR);
+                if(userResult.data) 
+                    return ResultHandler.failure("Ilegal username or password", Errors.UNAUTHORIZED);
+
+                const {id, passwordHash, isActive} = userResult.data;
+                if(!isActive) 
+                    return ResultHandler.failure("The account is dactivated", Errors.FORBIDDEN);
+                //vertiy password
+                const isPasswordValid = await verifyPassword(password, passwordHash);
+                if(!isPasswordValid) 
+                    return ResultHandler.failure("Ilegal username or password", Errors.UNAUTHORIZED);
+
+                //create session
+                const session = await createUserSession(id);
+                const safeUser = map
+
+            }
         }
+
 
     }
 }
