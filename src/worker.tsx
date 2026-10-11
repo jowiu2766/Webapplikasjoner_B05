@@ -7,7 +7,8 @@ import { AppLayout } from "./app/layouts/AppLayout";
 import { TestStateSceeen } from "@/app/pages/Screens/TestStateScreen";
 import { headers } from "happy-dom/lib/PropertySymbol";
 import { SafeUser } from "./db/schema";
-import { UserRole } from "./lib/auth/roles";
+import { AuthContext } from "./types/authorisation";
+import { setupDb, type DB } from "@/db";
 
 
 /**
@@ -23,10 +24,12 @@ import { UserRole } from "./lib/auth/roles";
 //  ctx.user = session?.user ?? null;
 //  ctx.role = getRole(ctx.user);}
 
+export interface Env{ DB: D1Database; }
+
 export type AppContext = {
-  user: SafeUser | null;
-  role: UserRole;
-};
+  db: DB;
+} & AuthContext;
+
 
 const app = defineApp([
   // Middleware. Kjører for hver forespørsel, i rekkefølgen de står.

@@ -19,5 +19,5 @@ export type ResultFunction ={
 }
 
 //Export server results function
-export type ServerResult<T, Y extends Record<string, unknown> = {}> = | {success: true; data: T} | {
-    success: false; error: string; code?: string; fieldErrors?: Record<string,string[]>; state?: UIEvent;};
+export type ServerResult<T, U extends Record<string, unknown> = {}> = | {success: true; data: T} | {
+    success: false; error: string; code?: string; fieldErrors?: Record<string,string[]>; state?: U;};

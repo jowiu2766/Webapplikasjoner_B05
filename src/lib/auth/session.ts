@@ -25,11 +25,12 @@ export async function createSession(userId: number):  Promise<Result<Session>> {
     }
 }
 //Gets session & user data
-export async function getSession(sessionId:string): Promise<Result<{session: Session; user: SafeUser} | null>> {
+export async function getSession(sessionId: string): Promise<Result<{session: Session; user: SafeUser} | null>> {
     try{
         const db = await getDb();
         const result = await db.select({
-            session: sessions, user:{
+            session: sessions, 
+            user:{
                 id: users.id,
                 username: users.username,
                 email: users.email,

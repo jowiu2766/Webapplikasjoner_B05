@@ -20,5 +20,5 @@ export type Err = {
 }
 
 export type ResultError = {
-    sucsess: false; error: Err;
+    success: false; error: Err;
 }

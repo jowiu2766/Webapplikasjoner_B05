@@ -33,13 +33,13 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 }));
 
 export const USER_ROLES = ["Unauthenticated","Tenant","Landlord","Admin" ] as const;
-export type UserRole = (typeof USER_ROLES)[number];
+//export type UserRole = (typeof USER_ROLES)[number];
 
 // Typen utledes FRA tabellen, så den kan aldri komme i utakt med skjemaet.
 export type User = typeof users.$inferSelect;
 export type CreateUser = typeof users.$inferInsert;
 export type Session = typeof sessions.$inferSelect;
 
-//export type UserRole = "Unauthenticated" | "Tenant" | "Landlord" | "Admin";
+export type UserRole = "Unauthenticated" | "Tenant" | "Landlord" | "Admin";
 
 export type SafeUser = Omit<User, "passwordHash">
