@@ -22,7 +22,21 @@ export function reqAuthorization(){
                 }
             )
         }
+        if(!ctx.user.isActive){
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: Errors.FORBIDDEN,
+            message: "Account deactivated",
+          },
+        }),
+        {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
+    };
 }
 
 //function for require role
