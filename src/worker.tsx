@@ -5,6 +5,9 @@ import { setCommonHeaders } from "@/app/headers";
 import { Home } from "@/app/pages/Home";
 import { AppLayout } from "./app/layouts/AppLayout";
 import { TestStateSceeen } from "@/app/pages/Screens/TestStateScreen";
+import { headers } from "happy-dom/lib/PropertySymbol";
+import { SafeUser } from "./db/schema";
+import { UserRole } from "./lib/auth/roles";
 
 
 /**
@@ -14,7 +17,16 @@ import { TestStateSceeen } from "@/app/pages/Screens/TestStateScreen";
  * fordi types/rw.d.ts mater denne typen inn i rwsdk.
  */
 //Expand context to have auythcontext, prevent type errors using xtx.user or xtx.session
-export type AppContext = {};
+//*
+//async function authMiddelware({ctx, request}){
+//  const session = await auth.api.getSesstion({headers: request.headers});
+//  ctx.user = session?.user ?? null;
+//  ctx.role = getRole(ctx.user);}
+
+export type AppContext = {
+  user: SafeUser | null;
+  role: UserRole;
+};
 
 const app = defineApp([
   // Middleware. Kjører for hver forespørsel, i rekkefølgen de står.

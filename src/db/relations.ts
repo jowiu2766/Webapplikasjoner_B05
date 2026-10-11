@@ -6,6 +6,9 @@
 // Det er dette objektet som gjør at
 // `db.query.tasks.findFirst({ with: { user: true } })` virker. Det sendes til
 // `drizzle(..., { relations })` i ./index.ts.
+
+
+/*
 import { defineRelations } from "drizzle-orm";
 import * as schema from "./schema";
 
@@ -25,3 +28,4 @@ export const relations = defineRelations(schema, (r) => ({
 }));
 
 export type Relations = typeof relations;
+*/
