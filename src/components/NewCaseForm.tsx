@@ -4,14 +4,12 @@ import { createCase } from "@/actions/cases";
 import { Placeholder } from "drizzle-orm";
 import { useState, useTransition } from "react";
 
-// måten jeg har satt opp date må nok endres
-function addDays(date: Date, days: number): Date {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
+// Setter deadline automatisk 7 dager fra sak sendes inn hvis deadline ikke blir satt av bruker
+function defaultDeadline() {
+  const now = new Date();
+  now.setDate(now.getDate() + 7);
+  return now;
 }
-
-const caseCreated = new Date(Date.now());
 
 export function NewCaseForm() {
   const [title, setTitle] = useState("");
@@ -29,7 +27,7 @@ export function NewCaseForm() {
     "low" | "medium" | "high" | "severe" | "choose"
   >("choose");
   const [description, setDescription] = useState("");
-  const [deadLine, setDeadLine] = useState(addDays(caseCreated, 7)); // Automatisk 7 dagers deadline fra sak blir sendt inn - må teste denne
+  const [deadLine, setDeadLine] = useState(defaultDeadline());
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -54,9 +52,10 @@ export function NewCaseForm() {
       setCategory("other");
       setDescription("");
       setPriority("low");
-      setDeadLine(addDays(new Date(), 7));
+      setDeadLine(defaultDeadline);
       setFiles([]);
     });
+    console.log(title, category, priority, description, deadLine, files);
   }
 
   return (
@@ -108,11 +107,24 @@ export function NewCaseForm() {
       />
       {/* Deadline */}
       <label htmlFor="deadLine">Tidsfrist</label>
-      <input type="date" name="deadline " id="deadLine" />
+      <input
+        type="date"
+        name="deadLine"
+        id="deadLine"
+        onChange={(e) => setDeadLine(new Date(e.target.value))}
+      />
       {/* Files - mulig å laste opp flere filer samtidig, men man må markere dem samtidig når de skal lastes opp. 
       Hvis ikke erstatter de filene som er lagt til allerede */}
       <label htmlFor="files">Filer</label>
-      <input type="file" id="files" name="files" multiple />
+      <input
+        type="file"
+        id="files"
+        name="files"
+        multiple
+        onChange={(e) => {
+          setFiles(Array.from(e.target.files ?? []));
+        }}
+      />
       {/* Submit button */}
       <div>
         <button type="submit" disabled={isPending}>
