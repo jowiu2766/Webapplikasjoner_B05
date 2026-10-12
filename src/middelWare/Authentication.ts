@@ -7,7 +7,7 @@ export async function authenticationMiddelware({ctx, request,} : {ctx: AppContex
 
     try{
         //Get sesison cookie
-        const cookies = request.headers.get("cooike");
+        const cookies = request.headers.get("cookie");
         if(!cookies) return;
 
         const sessionId = extractSessionFromCookies(cookies);
