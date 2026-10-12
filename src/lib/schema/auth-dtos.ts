@@ -42,6 +42,6 @@ export const AuthResponseDTOSchema = z.object({
 //types
 export type LoginDTO = z.infer<typeof LoginDTOSchema>;
 export type RegisterDTO = z.infer<typeof RegisterDTOSchema>;
-export type UserDTO = z.infer<typeof SessionDTOSchema>;
+export type UserDTO = z.infer<typeof UserDTOSchema>;
 export type SessionDTO = z.infer<typeof SessionDTOSchema>;
 export type AuthResponseDTO = z.infer<typeof AuthResponseDTOSchema>;

@@ -10,6 +10,7 @@ export const users = sqliteTable("users", {
   id: int().primaryKey({ autoIncrement: true }),
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
   role: text("role", { enum: ["Unauthenticated", "Tenant", "Landlord", "Admin"] }).notNull().default("Unauthenticated"),
   isActive: integer("is_active", {mode: "boolean"}).notNull().default(true),
   lastLoginAt: integer("last_login_at", {mode: "timestamp"}),

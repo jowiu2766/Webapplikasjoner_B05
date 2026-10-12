@@ -10,6 +10,8 @@ import { Errors } from "@/types/errors";
 import { createSession, deleteSession } from "@/lib/auth/session";
 import userEvent from "@testing-library/user-event";
 import { LoginDTOSchema, RegisterDTOSchema } from "@/lib/schema/auth-dtos";
+import { mapUserToDTO } from "@/lib/mappers/auth";
+import { hash } from "node:crypto";
 
 export interface AuthService{
     register(credentials: RegisterCredentials,): Promise<Result<{user: SafeUser; session: Session}>>;
@@ -39,6 +41,8 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
                 if(!userResult.success){
                     return ResultHandler.failure(userResult.error, Errors.INTERNAL_SERVER_ERROR);
                 }
+                if(!userResult.data) return ResultHandler.failure("User not found", Errors.NOT_FOUND);
+
                 return ResultHandler.sucsess(userResult.data);
             }catch(error){
                 console.error("Error fetching current user:", error);
@@ -103,10 +107,10 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
                 const userResult = await authRepository.findUserByUsername(username);
                 if(!userResult.success) 
                     return ResultHandler.failure(userResult.error, Errors.INTERNAL_SERVER_ERROR);
-                if(userResult.data) 
+                if(!userResult.data) 
                     return ResultHandler.failure("Ilegal username or password", Errors.UNAUTHORIZED);
 
-                const {id, passwordHash, isActive} = userResult.data;
+                const { id, passwordHash, isActive} = userResult.data;
                 if(!isActive) 
                     return ResultHandler.failure("The account is dactivated", Errors.FORBIDDEN);
                 //vertiy password
@@ -116,13 +120,52 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
 
                 //create session
                 const session = await createUserSession(id);
-                const safeUser = map
-
+                const safeUser = mapUserToDTO(userResult.data);
+                return ResultHandler.sucsess({user:safeUser, session});
+            }catch(error){
+                console.error("Login Error: ", error);
+                return ResultHandler.failure("Login failed", Errors.INTERNAL_SERVER_ERROR);
             }
-        }
+        },
 
+        async logout(sessionId){
+            if(!sessionId) 
+                return ResultHandler.failure("Session IS is required", Errors.UNAUTHORIZED);
+            return await deleteSession(sessionId);
+        },
 
-    }
+        async createAdminUser(credentials){
+            try{
+                //Check if admin alreasy exists
+                const adminExist = await authRepository.findUserByUsername(credentials.username);
+                if(!adminExist.success) return ResultHandler.failure(adminExist.error, Errors.INTERNAL_SERVER_ERROR);
+                if(adminExist.data) return ResultHandler.failure("Existing user", Errors.CONFLICT);
+                //validate
+                const validation = RegisterDTOSchema.safeParse(credentials);
+                if(!validation.success) return ResultHandler.failure(`Validation vaoided: ${validation.error.message}`, Errors.VALIDATION_ERROR);
+
+                const {username,email, password} = validation.data;
+                //validate password strenght
+                const passwordValidation = validatePasswordStrength(password);
+                if(!passwordValidation.isValid) return ResultHandler.failure(passwordValidation.errors.join(", "), Errors.VALIDATION_ERROR);
+
+                //hash apssword
+                const passwordHash = await hashPassword(password);
+                //creatre admin user
+                const createUserResult = await authRepository.createUser({
+                    username, email, passwordHash, role: "Admin",
+                });
+
+                if(!createUserResult.success) return ResultHandler.failure(createUserResult.error, Errors.INTERNAL_SERVER_ERROR);
+                //create session
+                const session = await createUserSession(createUserResult.data.id);
+                return ResultHandler.sucsess({user: createUserResult.data, session});
+            }catch(error){
+                console.error("Admin creation error", error);
+                return ResultHandler.failure("Failed to create admin user", Errors.INTERNAL_SERVER_ERROR);
+            }
+        },
+    };
 }
 
 export const authService = createAuthService(authRepository);
