@@ -45,7 +45,7 @@ export function NewCaseForm() {
         files,
       );
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Feil ved innsending av skjema"); // må forbedre feilmelding her, midlertidig fiks
         return;
       }
       setTitle("");
