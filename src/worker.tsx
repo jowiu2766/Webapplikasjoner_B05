@@ -26,7 +26,7 @@ const app = defineApp([
   render(Document, [
     route("/", Home),
     route("/saker", SakerList),
-    route("saker/ny", NewCase),
+    route("/saker/ny", NewCase),
   ]),
 ]);
 
