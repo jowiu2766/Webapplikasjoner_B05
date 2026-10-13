@@ -24,7 +24,7 @@ export function createAuthRepository(db: DB): AuthRepository{
                 return ResultHandler.sucsess(result[0] || null);
             }catch(error){
                 console.error("Error finding user by username:", error);
-                return ResultHandler.failure("Faled to find user", Errors.INTERNAL_SERVER_ERROR);
+                return ResultHandler.failure("Failed to find user", Errors.INTERNAL_SERVER_ERROR);
             }
         },
     
@@ -34,7 +34,7 @@ export function createAuthRepository(db: DB): AuthRepository{
                 return ResultHandler.sucsess(result[0] || null);
             }catch(error){
                 console.error("Error finding user by email:", error);
-                return ResultHandler.failure("Faled to find user", Errors.INTERNAL_SERVER_ERROR);
+                return ResultHandler.failure("Failed to find user", Errors.INTERNAL_SERVER_ERROR);
             }
         },
         async findUserById(id: number){
@@ -43,7 +43,7 @@ export function createAuthRepository(db: DB): AuthRepository{
                 return ResultHandler.sucsess(result[0] || null);
             }catch(error){
                 console.error("Error finding user by id:", error);
-                return ResultHandler.failure("Faled to find user", Errors.INTERNAL_SERVER_ERROR);
+                return ResultHandler.failure("Failed to find user", Errors.INTERNAL_SERVER_ERROR);
             }
         },
 
