@@ -122,6 +122,37 @@ export function RegisterForm() {
               placeholder="din@epost.no"
             />
           </div>
+          <div>
+            <label role="radiogroup" className="block text-sm font-medium text-gray-700 mb-1">
+              Role
+            </label>
+            <div className="mt-1 space-y-2">
+              <div className="flex items-center">
+                <input
+                  id="role-tenant"
+                  name="role"
+                  type="radio"
+                  value="Tenant"
+                  className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
+                />
+                <label htmlFor="role-tenant" className="ml-3 block text-sm text-gray-700">
+                  Tenant
+                </label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  id="role-landlord"
+                  name="role"
+                  type="radio"
+                  value="Landlord"
+                  className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
+                />
+                <label htmlFor="role-landlord" className="ml-3 block text-sm text-gray-700">
+                  Landlord
+                </label>
+              </div>
+            </div>
+          </div>
 
           <div>
             <label
