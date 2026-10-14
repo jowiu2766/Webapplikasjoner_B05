@@ -3,8 +3,8 @@ import { render, route } from "rwsdk/router";
 import { Document } from "@/app/Document";
 import { setCommonHeaders } from "@/app/headers";
 import { Home } from "@/app/pages/Home";
-import { NewCase } from "./app/pages/NewCase";
 import { SakerList } from "@/app/pages/saker/List";
+import { NewCase } from "./app/pages/saker/NewCase";
 
 /**
  * Alt som ligger på `ctx` for én forespørsel.
