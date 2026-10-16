@@ -10,6 +10,8 @@ import { SafeUser } from "./db/schema";
 import { AuthContext } from "./types/authorisation";
 import { setupDb, type DB } from "@/db";
 
+import { NewCase } from "./app/pages/NewCase";
+import { SakerList } from "@/app/pages/saker/List";
 
 /**
  * Alt som ligger på `ctx` for én forespørsel.
@@ -37,9 +39,7 @@ const app = defineApp([
 
   // API-rute. Ligger UTENFOR render(), så svaret er akkurat det handleren
   // returnerer: JSON, uten HTML-skall rundt.
-  route("/api/status", () =>
-    Response.json({ status: "ok", version: "0.1.0" })
-  ),
+  route("/api/status", () => Response.json({ status: "ok", version: "0.1.0" })),
 
   // Sider. render(Document, [...]) pakker dem i et helt HTML-dokument.
   render(Document,[
@@ -49,5 +49,11 @@ const app = defineApp([
       ])
     ])
   ]);
+  render(Document, [
+    route("/", Home),
+    route("/saker", SakerList),
+    route("/saker/ny", NewCase),
+  ]),
+]);
 
 export default { fetch: app.fetch };

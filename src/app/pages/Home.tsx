@@ -17,7 +17,8 @@ export function Home() {
       <h1 className="text-3xl font-bold">Fiksa</h1>
       
       <p className="mt-2 text-slate-600">
-        Fiksa samler dialogen mellom leietaker og utleier på ett sted. Startprosjektet virker.
+        Fiksa samler dialogen mellom leietaker og utleier på ett sted.
+        Startprosjektet virker.
       </p>
 
       <p className="mt-6 text-sm text-slate-500">
@@ -29,6 +30,11 @@ export function Home() {
       <TimeClient />
 
       <Counter />
+
+      <button>
+        {" "}
+        <a href="/saker/ny">Opprett sak</a>
+      </button>
 
       <h2 className="mt-10 text-xl font-semibold">Prøv dette</h2>
       <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">

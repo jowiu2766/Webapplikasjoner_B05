@@ -2,10 +2,10 @@ import { sqliteTable, text, int, integer } from "drizzle-orm/sqlite-core";
 import { createId } from "@/lib/utils/id";
 import { relations } from "drizzle-orm";
 
+import { sqliteTable, text, int } from "drizzle-orm/sqlite-core";
+import { userRoles } from "@/lib/enums";
 
-/**
- * Eksempeltabell. Bytt den ut med deres egen datamodell.
- */
+// brukere
 export const users = sqliteTable("users", {
   id: int().primaryKey({ autoIncrement: true }),
   username: text("username").notNull().unique(),
@@ -17,6 +17,10 @@ export const users = sqliteTable("users", {
   createdAt: integer("created_at", {mode:"timestamp"}).notNull().$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", {mode: "timestamp"}).$onUpdateFn(() => new Date()),
 
+  name: text().notNull(),
+  email: text().notNull().unique(),
+  // leietaker eller utleier
+  role: text({ enum: userRoles }).notNull().default("tenant"),
 });
 
 export const sessions = sqliteTable("sessions", {
