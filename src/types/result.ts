@@ -14,7 +14,7 @@ export type Result<T> = ResultData<T> | ResultError;
 
 //result function type
 export type ResultFunction ={
-    sucsess: <T>(data: T, pagination?: Pagination) => ResultData<T>;
+    success: <T>(data: T, pagination?: Pagination) => ResultData<T>;
     failure: (error: unknown, code: ErrorCode) => ResultError;
 }
 
