@@ -1,8 +1,13 @@
 "use client";
 
-import { createCase } from "@/actions/cases";
-import { Placeholder } from "drizzle-orm";
+import { createCaseAction } from "@/app/features/caseActions";
 import { useState, useTransition } from "react";
+import {
+  caseCategories,
+  CaseCategory,
+  casePriorities,
+  CasePriority,
+} from "@/lib/enums";
 
 // Setter deadline automatisk 7 dager fra sak sendes inn hvis deadline ikke blir satt av bruker
 function defaultDeadline() {
@@ -13,19 +18,8 @@ function defaultDeadline() {
 
 export function NewCaseForm() {
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<
-    | "electricity"
-    | "pipes"
-    | "pests"
-    | "water damage"
-    | "maintenance issue"
-    | "complaint"
-    | "other"
-    | "choose"
-  >("choose");
-  const [priority, setPriority] = useState<
-    "low" | "medium" | "high" | "severe" | "choose"
-  >("choose");
+  const [category, setCategory] = useState<CaseCategory | "choose">("choose");
+  const [priority, setPriority] = useState<CasePriority | "choose">("choose");
   const [description, setDescription] = useState("");
   const [deadLine, setDeadLine] = useState(defaultDeadline());
   const [files, setFiles] = useState<File[]>([]);
@@ -36,22 +30,22 @@ export function NewCaseForm() {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const result = await createCase(
+      const result = await createCaseAction(
         title,
         category,
         priority,
         description,
-        deadLine.toISOString(),
-        files,
+        //    deadLine.toISOString(),
+        //  files,
       );
       if (!result.ok) {
         setError(result.error ?? "Feil ved innsending av skjema"); // må forbedre feilmelding her, midlertidig fiks
         return;
       }
       setTitle("");
-      setCategory("other");
+      setCategory("choose");
+      setPriority("choose");
       setDescription("");
-      setPriority("low");
       setDeadLine(defaultDeadline);
       setFiles([]);
     });
@@ -79,8 +73,8 @@ export function NewCaseForm() {
         <option value="electricity">Elektrisitet</option>
         <option value="pipes">Rør</option>
         <option value="pests">Skadedyr</option>
-        <option value="water damage">Vannskade</option>
-        <option value="maintenance issue">Vedlikehold</option>
+        <option value="water_damage">Vannskade</option>
+        <option value="maintenance">Vedlikehold</option>
         <option value="complaint">Klage</option>
         <option value="other">Annet</option>
       </select>
@@ -96,7 +90,7 @@ export function NewCaseForm() {
         <option value="low">Lav</option>
         <option value="medium">Medium</option>
         <option value="high">Høy</option>
-        <option value="severe">Kritisk</option>
+        <option value="critical">Kritisk</option>
       </select>
       {/* Decription */}
       <textarea
