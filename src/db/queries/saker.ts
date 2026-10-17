@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import type { User } from "@/db/schema";
+import type { User } from "@/db/schema/auth-schema";
 import type { SakFilter } from "@/lib/sak-filter";
 
 // sakene en bruker får se, nyeste først

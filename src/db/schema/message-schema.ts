@@ -1,0 +1,44 @@
+
+import {
+  index,
+  integer,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
+
+import { cases } from "./case-schema";
+import { user } from "./auth-schema";
+import { createId } from "@/lib/id";
+
+// En melding tilhører én sak og har én avsender.
+export const messages = sqliteTable(
+  "messages",
+  {
+    id: text("id")
+      .primaryKey()
+      .$default(() => createId()),
+
+    caseId: text("case_id")
+      .notNull()
+      .references(() => cases.id),
+
+    senderId: text("sender_id")
+      .notNull()
+      .references(() => user.id),
+
+    body: text("body").notNull(),
+
+    createdAt: integer("created_at", {
+      mode: "timestamp",
+    })
+      .notNull()
+      .$default(() => new Date()),
+  },
+  (table) => [
+    index("idx_messages_case_id").on(table.caseId),
+    index("idx_messages_sender_id").on(table.senderId),
+  ]
+);
+
+export type Message = typeof messages.$inferSelect;
+export type CreateMessage = typeof messages.$inferInsert;
