@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 
+//User schema 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -8,6 +9,8 @@ export const user = sqliteTable("user", {
   emailVerified: integer("email_verified", { mode: "boolean" })
     .default(false)
     .notNull(),
+  passwordHash: text("password_hash").notNull(),
+  role: text("role", { enum: ["Unauthenticated", "Tenant", "Landlord", "Admin"] }).notNull().default("Unauthenticated"),
   image: text("image"),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
@@ -16,7 +19,7 @@ export const user = sqliteTable("user", {
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
-  role: text("role").default("tenant"),
+  isActive: integer("is_active", {mode: "boolean"}).notNull().default(true),
   address: text("address"),
 });
 
@@ -89,5 +92,16 @@ export const verification = sqliteTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
+  }),
+}));
+
+//Utledelses schema
 export type User = typeof user.$inferSelect;
 export type CreateUser = typeof user.$inferInsert;
+export type Session = typeof sessions.$inferSelect;
+export type UserRole = "Unauthenticated" | "Tenant" | "Landlord" | "Admin";
+export type SafeUser = Omit<User, "passwordHash">
