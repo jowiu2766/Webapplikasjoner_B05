@@ -21,7 +21,7 @@ export function NewCaseForm() {
   const [category, setCategory] = useState<CaseCategory | "choose">("choose");
   const [priority, setPriority] = useState<CasePriority | "choose">("choose");
   const [description, setDescription] = useState("");
-  const [deadLine, setDeadLine] = useState(defaultDeadline());
+  const [deadline, setDeadLine] = useState(defaultDeadline());
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -35,7 +35,7 @@ export function NewCaseForm() {
         category,
         priority,
         description,
-        //    deadLine.toISOString(),
+        deadline.toISOString(),
         //  files,
       );
       if (!result.ok) {
@@ -46,10 +46,10 @@ export function NewCaseForm() {
       setCategory("choose");
       setPriority("choose");
       setDescription("");
-      setDeadLine(defaultDeadline);
+      setDeadLine(defaultDeadline());
       setFiles([]);
     });
-    console.log(title, category, priority, description, deadLine, files);
+    console.log(title, category, priority, description, deadline, files);
   }
 
   return (
@@ -100,11 +100,11 @@ export function NewCaseForm() {
         placeholder="Forklar detaljert hva saken gjelder"
       />
       {/* Deadline */}
-      <label htmlFor="deadLine">Tidsfrist</label>
+      <label htmlFor="deadline">Tidsfrist</label>
       <input
         type="date"
-        name="deadLine"
-        id="deadLine"
+        name="deadline"
+        id="deadline"
         onChange={(e) => setDeadLine(new Date(e.target.value))}
       />
       {/* Files - mulig å laste opp flere filer samtidig, men man må markere dem samtidig når de skal lastes opp. 

@@ -10,12 +10,14 @@ export async function createCaseAction(
   category: string,
   priority: string,
   description: string,
+  deadline: string,
 ): Promise<Result<Case>> {
   const validation = createCaseSchema.safeParse({
     title,
     category,
     priority,
     description,
+    deadline,
   });
 
   // Må legge til bedre validering
