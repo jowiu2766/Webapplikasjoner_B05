@@ -19,7 +19,7 @@ export async function SakerList({ request }: RequestInfo) {
 
   // midlertidig til innlogging er på plass, velg bruker med ?rolle=landlord
   const rolle = url.searchParams.get("rolle") === "landlord" ? "landlord" : "tenant";
-  const bruker = await db.query.users.findFirst({ where: { role: rolle } });
+  const bruker = await db.query.user.findFirst({ where: { role: rolle } });
   if (!bruker) {
     return (
       <main className="mx-auto max-w-4xl p-8 font-sans">

@@ -1,5 +1,5 @@
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { users } from "./user-schema";
+import { user } from "./auth-schema";
 import { createId } from "@/lib/id";
 import { caseCategories, casePriorities, caseStatuses } from "@/lib/enums";
 
@@ -15,15 +15,26 @@ export const cases = sqliteTable(
     category: text("category", { enum: caseCategories }).notNull(),
     priority: text("priority", { enum: casePriorities }).notNull(),
     status: text("status", { enum: caseStatuses }).notNull().default("open"),
-    tenantId: integer("tenant_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    landlordId: integer("landlord_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
+    tenantId: text("tenant_id")
+  .notNull()
+  .references(() => user.id),
+
+landlordId: text("landlord_id")
+  .notNull()
+  .references(() => user.id),
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .$default(() => new Date()),
+
+      deadline: integer("deadline", {
+  mode: "timestamp",
+}),
+
+updatedAt: integer("updated_at", {
+  mode: "timestamp",
+})
+  .notNull()
+  .$default(() => new Date()),
   },
   (table) => [
     index("idx_cases_tenant_id").on(table.tenantId),

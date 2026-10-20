@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import type { Case, User } from "@/db/schema";
+import type { Case } from "@/db/schema";
+import type { User } from "@/db/schema/auth-schema";
 import { categoryLabels, priorityLabels, statusLabels } from "@/lib/enums";
 
 // en sak i lista, tabellrad på desktop og kort på mobil
