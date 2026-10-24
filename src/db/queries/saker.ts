@@ -1,5 +1,8 @@
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import type { User } from "@/db/schema";
+import { cases, messages } from "@/db/schema";
+import type { CreateMessage, User } from "@/db/schema";
+import type { CaseStatus } from "@/lib/enums";
 import type { SakFilter } from "@/lib/sak-filter";
 
 // sakene en bruker får se, nyeste først
@@ -14,4 +17,31 @@ export function listSaker(bruker: User, filter: SakFilter = {}) {
     with: { tenant: true },
     orderBy: { createdAt: "desc" },
   });
+}
+
+export function hentSak(id: string) {
+  return db.query.cases.findFirst({
+    where: { id },
+    with: {
+      tenant: true,
+      landlord: true,
+      messages: { with: { sender: true }, orderBy: { createdAt: "asc" } },
+    },
+  });
+}
+
+export type SakMedMeldinger = NonNullable<Awaited<ReturnType<typeof hentSak>>>;
+
+export async function leggTilMelding(data: CreateMessage) {
+  const [melding] = await db.insert(messages).values(data).returning();
+  return melding;
+}
+
+export async function settStatus(id: string, status: CaseStatus) {
+  const [sak] = await db
+    .update(cases)
+    .set({ status })
+    .where(eq(cases.id, id))
+    .returning();
+  return sak;
 }

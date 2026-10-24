@@ -5,6 +5,7 @@ import { setCommonHeaders } from "@/app/headers";
 import { Home } from "@/app/pages/Home";
 import { NewCase } from "./app/pages/NewCase";
 import { SakerList } from "@/app/pages/saker/List";
+import { SakDetalj } from "@/app/pages/saker/Detail";
 
 /**
  * Alt som ligger på `ctx` for én forespørsel.
@@ -27,6 +28,8 @@ const app = defineApp([
     route("/", Home),
     route("/saker", SakerList),
     route("/saker/ny", NewCase),
+    // etter /saker/ny, ellers tolkes «ny» som en id
+    route("/saker/:id", SakDetalj),
   ]),
 ]);
 
