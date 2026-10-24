@@ -4,3 +4,4 @@
 export * from "./user-schema";
 export * from "./task-schema";
 export * from "./case-schema";
+export * from "./message-schema";
