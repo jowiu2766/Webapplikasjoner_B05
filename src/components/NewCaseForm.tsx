@@ -38,7 +38,7 @@ export function NewCaseForm() {
         deadline.toISOString(),
         //  files,
       );
-      if (!result.ok) {
+      if (!result) {
         setError(result.error ?? "Feil ved innsending av skjema"); // må forbedre feilmelding her, midlertidig fiks
         return;
       }
@@ -49,25 +49,36 @@ export function NewCaseForm() {
       setDeadLine(defaultDeadline());
       setFiles([]);
     });
-    console.log(title, category, priority, description, deadline, files);
   }
 
   return (
-    <form onSubmit={onSubmit}>
+    <form
+      onSubmit={onSubmit}
+      className="mx-auto mt-6 flex w-full max-w-md flex-col gap-4 text-sm"
+    >
       {/* Title */}
-      <textarea
-        value={title}
-        id="title"
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Kort forklaring av sak"
-      />
+      <fieldset>
+        <label htmlFor="title" className="flex pb-3 font-medium text-slate-500">
+          Tittel
+        </label>
+        <textarea
+          value={title}
+          id="title"
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Kort forklaring av sak"
+          className="w-full rounded-md border border-slate-300 px-3 py-2"
+        />
+      </fieldset>
       {/* Category */}
-      <label htmlFor="category">Kategori</label>
+      <label htmlFor="category" className="flex font-medium text-slate-500">
+        Kategori
+      </label>
       <select
         id="category"
         name="category"
         value={category}
         onChange={(e) => setCategory(e.target.value as typeof category)}
+        className="w-64 rounded-md border border-slate-300 px-3 py-2 cursor-pointer"
       >
         <option value="choose">Velg</option>
         <option value="electricity">Elektrisitet</option>
@@ -79,12 +90,15 @@ export function NewCaseForm() {
         <option value="other">Annet</option>
       </select>
       {/* Priority */}
-      <label htmlFor="priority">Prioritet</label>
+      <label htmlFor="priority" className="flex font-medium text-slate-500">
+        Prioritet
+      </label>
       <select
         id="priority"
         name="priority"
         value={priority}
         onChange={(e) => setPriority(e.target.value as typeof priority)}
+        className="w-64 rounded-md border border-slate-300 px-3 py-2 cursor-pointer"
       >
         <option value="choose">Velg</option>
         <option value="low">Lav</option>
@@ -93,23 +107,37 @@ export function NewCaseForm() {
         <option value="critical">Kritisk</option>
       </select>
       {/* Decription */}
-      <textarea
-        value={description}
-        id="description"
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="Forklar detaljert hva saken gjelder"
-      />
+      <fieldset>
+        <label
+          htmlFor="description"
+          className="flex pb-3 font-medium text-slate-500"
+        >
+          Beskrivelse
+        </label>
+        <textarea
+          value={description}
+          id="description"
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Forklar detaljert hva saken gjelder"
+          className="w-full rounded-md border border-slate-300 px-3 py-2 "
+        />
+      </fieldset>
       {/* Deadline */}
-      <label htmlFor="deadline">Tidsfrist</label>
+      <label htmlFor="deadline" className="flex font-medium text-slate-500">
+        Tidsfrist
+      </label>
       <input
         type="date"
         name="deadline"
         id="deadline"
         onChange={(e) => setDeadLine(new Date(e.target.value))}
+        className="w-64 rounded-md border border-slate-300 px-3 py-2 cursor-pointer"
       />
       {/* Files - mulig å laste opp flere filer samtidig, men man må markere dem samtidig når de skal lastes opp. 
       Hvis ikke erstatter de filene som er lagt til allerede */}
-      <label htmlFor="files">Filer</label>
+      <label htmlFor="files" className="flex font-medium text-slate-500">
+        Filer
+      </label>
       <input
         type="file"
         id="files"
@@ -118,10 +146,15 @@ export function NewCaseForm() {
         onChange={(e) => {
           setFiles(Array.from(e.target.files ?? []));
         }}
+        className="text-sm file:cursor-pointer file:rounded-md file:bg-slate-100 file:px-3 file:py-2"
       />
       {/* Submit button */}
       <div>
-        <button type="submit" disabled={isPending}>
+        <button
+          type="submit"
+          disabled={isPending}
+          className="rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-700"
+        >
           {isPending ? "Sender..." : "Send"}
         </button>
       </div>
