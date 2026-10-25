@@ -47,9 +47,11 @@ export const seedData = async (env: Env) => {
   await db.insert(cases).values([
     {
       title: "Vannlekkasje under kjøkkenvasken",
-      description: "Det drypper fra røret under vasken. Har satt en bøtte under.",
+      description:
+        "Det drypper fra røret under vasken. Har satt en bøtte under.",
       category: "pipes",
       priority: "high",
+      deadline: new Date(Date.now() + 3 * dag),
       status: "open",
       tenantId: leietaker.id,
       landlordId: utleier.id,
@@ -60,6 +62,7 @@ export const seedData = async (env: Env) => {
       description: "Ingen strøm i kontakten ved speilet. Sikringen er sjekket.",
       category: "electricity",
       priority: "medium",
+      deadline: new Date(Date.now() + 5 * dag),
       status: "in_progress",
       tenantId: leietaker.id,
       landlordId: utleier.id,
@@ -70,6 +73,7 @@ export const seedData = async (env: Env) => {
       description: "Små svarte maur kommer inn ved vinduet over benken.",
       category: "pests",
       priority: "low",
+      deadline: new Date(Date.now() + 12 * dag),
       status: "pending",
       tenantId: leietaker.id,
       landlordId: utleier.id,
@@ -79,6 +83,7 @@ export const seedData = async (env: Env) => {
       title: "Dørlåsen henger",
       description: "Nøkkelen må vris hardt for å få opp ytterdøra.",
       category: "maintenance",
+      deadline: new Date(Date.now() + 2 * dag),
       priority: "medium",
       status: "closed",
       tenantId: leietaker.id,
