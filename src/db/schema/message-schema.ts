@@ -6,12 +6,7 @@ import {
   text,
 } from "drizzle-orm/sqlite-core";
 
-import { cases } from "./case-schema";
-import { user } from "./auth-schema";
-import { createId } from "@/lib/id";
-
 // En melding tilhører én sak og har én avsender.
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { cases } from "./case-schema";
 import { users } from "./user-schema";
 import { createId } from "@/lib/id";
