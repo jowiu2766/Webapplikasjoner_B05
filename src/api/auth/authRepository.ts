@@ -1,5 +1,5 @@
 import {getDb, type DB} from "@/db"
-import { users } from "@/db/schema";
+import { user } from "@/db/schema";
 import type {User, CreateUser, SafeUser} from "@/db/schema"
 import type { Result } from "@/types/result";
 import { ResultHandler } from "@/lib/utils/result";
@@ -11,16 +11,16 @@ import { isAbsolute } from "node:path";
 export interface AuthRepository{
     findUserByUsername(username: string): Promise<Result<User | null>>;
     findUserByEmail(email: string): Promise<Result<User | null>>;
-    findUserById(id: number): Promise<Result<User | null>>;
+    findUserById(id: string): Promise<Result<User | null>>;
     createUser(data: CreateUser): Promise<Result<SafeUser>>;
     updateLastLogin(userId: number): Promise<Result<void>>;
 }
 
 export function createAuthRepository(db: DB): AuthRepository{
     return{
-        async findUserByUsername(username: string){
+        async findUserByUsername(name: string){
             try{
-                const result = await db.select().from(users).where(eq(users.username, username)).limit(1);
+                const result = await db.select().from(user).where(eq(user.name, name)).limit(1);
                 return ResultHandler.success(result[0] || null);
             }catch(error){
                 console.error("Error finding user by username:", error);
@@ -30,16 +30,16 @@ export function createAuthRepository(db: DB): AuthRepository{
     
         async findUserByEmail(email: string){
             try{
-                const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+                const result = await db.select().from(user).where(eq(user.email, email)).limit(1);
                 return ResultHandler.success(result[0] || null);
             }catch(error){
                 console.error("Error finding user by email:", error);
                 return ResultHandler.failure("Failed to find user", Errors.INTERNAL_SERVER_ERROR);
             }
         },
-        async findUserById(id: number){
+        async findUserById(id: string){
              try{
-                const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+                const result = await db.select().from(user).where(eq(user.id, id)).limit(1);
                 return ResultHandler.success(result[0] || null);
             }catch(error){
                 console.error("Error finding user by id:", error);
@@ -49,15 +49,18 @@ export function createAuthRepository(db: DB): AuthRepository{
 
         async createUser(data: CreateUser){
             try{
-                const [newUser] = await db.insert(users).values(data).returning({
-                    id: users.id,
-                    username: users.username,
-                    email: users.email,
-                    role: users.role,
-                    isActive: users.isActive,
-                    lastLoginAt: users.lastLoginAt,
-                    createdAt: users.createdAt,
-                    updatedAt: users.updatedAt,
+                const [newUser] = await db.insert(user).values(data).returning({
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    emailVerified: user.emailVerified,
+                    role: user.role,
+                    image: user.image,
+                    createdAt: user.createdAt,
+                    updatedAt: user.updatedAt,
+                    lastLoginAt: user.lastLoginAt,
+                    isActive: user.isActive,
+                    address: user.address,
                 });
                 return ResultHandler.success(newUser);
             }catch(error) {
@@ -67,7 +70,7 @@ export function createAuthRepository(db: DB): AuthRepository{
         },
         async updateLastLogin(userId: number){
             try{
-                await db.update(users).set({lastLoginAt: new Date()}).where(eq(users.id, userId));
+                await db.update(user).set({lastLoginAt: new Date()}).where(eq(user.id, userId));
                 return ResultHandler.success(undefined);
             }catch(error){
                 console.error("Error updating last login:", error);
