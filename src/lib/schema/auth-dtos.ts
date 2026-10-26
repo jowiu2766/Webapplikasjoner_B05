@@ -1,45 +1,42 @@
-import {z} from "zod";
+import { z } from "zod";
+import { userRoles } from "@/lib/enums";
 
-//login DTO schemas
 export const LoginDTOSchema = z.object({
-    username: z.string().min(3).max(8),
-    password: z.string().min(8),
+  username: z.string().min(3).max(30),
+  password: z.string().min(8),
 });
 
-//registe DTO schemas
 export const RegisterDTOSchema = z.object({
-    username: z.string().min(3).max(30),
-    email: z.email(),
-    password: z.string().min(8),
+  username: z.string().min(3).max(30),
+  email: z.email(),
+  password: z.string().min(8),
+  role: z.enum(userRoles).default("tenant"),
 });
 
-//user DTO for response(never incluides password hash)
+// Aldri passordhash ut.
 export const UserDTOSchema = z.object({
-    id: z.coerce.number(),
-    username: z.string().trim(),
-    email: z.string().trim(),
-    role: z.enum(["Unauthenticated" , "Tenant" , "Landlord" , "Admin"]),
-    isActive: z.boolean(),
-    lastLoginAt: z.date().nullable(),
-    createdAt: z.date(),
-    updatedAt: z.date().nullable(),
+  id: z.string(),
+  name: z.string().trim(),
+  email: z.string().trim(),
+  role: z.enum(userRoles),
+  isActive: z.boolean(),
+  lastLoginAt: z.date().nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
 
-//Session DTO
 export const SessionDTOSchema = z.object({
-    id: z.string(),
-    userId: z.coerce.number(),
-    expiresAt: z.date(),
-    createdAt: z.date(),
+  id: z.string(),
+  userId: z.string(),
+  expiresAt: z.date(),
+  createdAt: z.date(),
 });
 
-//Auth response DTO
 export const AuthResponseDTOSchema = z.object({
-    user: UserDTOSchema,
-    session: SessionDTOSchema,
+  user: UserDTOSchema,
+  session: SessionDTOSchema,
 });
 
-//types
 export type LoginDTO = z.infer<typeof LoginDTOSchema>;
 export type RegisterDTO = z.infer<typeof RegisterDTOSchema>;
 export type UserDTO = z.infer<typeof UserDTOSchema>;

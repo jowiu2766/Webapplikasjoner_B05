@@ -41,14 +41,14 @@ describe("kanAvbryteSak", () => {
 });
 
 describe("harTilgang", () => {
-  const sak = { tenantId: 1, landlordId: 2 };
+  const sak = { tenantId: "u1", landlordId: "u2" };
 
   it("leietaker og utleier på saken har tilgang", () => {
-    expect(harTilgang({ id: 1 }, sak)).toBe(true);
-    expect(harTilgang({ id: 2 }, sak)).toBe(true);
+    expect(harTilgang({ id: "u1" }, sak)).toBe(true);
+    expect(harTilgang({ id: "u2" }, sak)).toBe(true);
   });
 
   it("andre har ikke tilgang", () => {
-    expect(harTilgang({ id: 3 }, sak)).toBe(false);
+    expect(harTilgang({ id: "u3" }, sak)).toBe(false);
   });
 });

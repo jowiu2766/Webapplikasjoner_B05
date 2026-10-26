@@ -10,26 +10,18 @@ import {
 } from "@/lib/enums";
 import { EmptyState } from "@/components/EmptyState";
 import { SakRad } from "@/components/SakRad";
-import { NewCase } from "./NewCase";
 
 // sakslista, filteret er et vanlig skjema med method=get
 export async function SakerList({ request }: RequestInfo) {
   const url = new URL(request.url);
   const filter = parseSakFilter(url.searchParams);
-  const harFilter =
-    filter.status !== undefined || filter.prioritet !== undefined;
+  const harFilter = filter.status !== undefined || filter.prioritet !== undefined;
 
-  // midlertidig til innlogging er på plass, velg bruker med ?rolle=landlord
-  const rolle =
-    url.searchParams.get("rolle") === "landlord" ? "landlord" : "tenant";
-  const bruker = await db.query.users.findFirst({ where: { role: rolle } });
   const bruker = await midlertidigBruker(request);
   if (!bruker) {
     return (
       <main className="mx-auto max-w-4xl p-8 font-sans">
-        <EmptyState title="Fant ingen bruker">
-          Kjør npm run seed først.
-        </EmptyState>
+        <EmptyState title="Fant ingen bruker">Kjør npm run seed først.</EmptyState>
       </main>
     );
   }
@@ -44,23 +36,16 @@ export async function SakerList({ request }: RequestInfo) {
     <main className="mx-auto max-w-4xl p-8 font-sans">
       <h1 className="text-3xl font-bold">Saker</h1>
       <p className="mt-2 text-slate-600">
-        {erUtleier ? "Saker sendt til deg" : "Sakene du har meldt inn"} (
-        {bruker.name})
+        {erUtleier ? "Saker sendt til deg" : "Sakene du har meldt inn"} ({bruker.name})
       </p>
-      <form
-        method="get"
-        className="mt-6 flex flex-wrap items-end gap-3 text-sm"
-      >
+
+      <form method="get" className="mt-6 flex flex-wrap items-end gap-3 text-sm">
         {/* rollen blir med når skjemaet sendes */}
         <input type="hidden" name="rolle" value={rolle} />
 
         <label className="flex flex-col">
           Status
-          <select
-            name="status"
-            defaultValue={filter.status ?? ""}
-            className={selectClass}
-          >
+          <select name="status" defaultValue={filter.status ?? ""} className={selectClass}>
             <option value="">Alle</option>
             {caseStatuses.map((status) => (
               <option key={status} value={status}>
@@ -72,11 +57,7 @@ export async function SakerList({ request }: RequestInfo) {
 
         <label className="flex flex-col">
           Prioritet
-          <select
-            name="prioritet"
-            defaultValue={filter.prioritet ?? ""}
-            className={selectClass}
-          >
+          <select name="prioritet" defaultValue={filter.prioritet ?? ""} className={selectClass}>
             <option value="">Alle</option>
             {casePriorities.map((prioritet) => (
               <option key={prioritet} value={prioritet}>
@@ -99,11 +80,10 @@ export async function SakerList({ request }: RequestInfo) {
           </a>
         )}
       </form>
+
       {saker.length === 0 ? (
         <EmptyState title="Ingen saker">
-          {harFilter
-            ? "Ingen saker passer filteret."
-            : "Ingenting er meldt inn ennå."}
+          {harFilter ? "Ingen saker passer filteret." : "Ingenting er meldt inn ennå."}
         </EmptyState>
       ) : (
         <table className="mt-6 block w-full text-left text-sm md:table">
@@ -114,9 +94,7 @@ export async function SakerList({ request }: RequestInfo) {
               <th className="py-2 pr-4 font-medium">Prioritet</th>
               <th className="py-2 pr-4 font-medium">Tidsfrist</th>
               <th className="py-2 pr-4 font-medium">Status</th>
-              {erUtleier && (
-                <th className="py-2 pr-4 font-medium">Leietaker</th>
-              )}
+              {erUtleier && <th className="py-2 pr-4 font-medium">Leietaker</th>}
               <th className="py-2 pr-4 font-medium">Opprettet</th>
             </tr>
           </thead>
@@ -129,7 +107,7 @@ export async function SakerList({ request }: RequestInfo) {
       )}
       <a
         href="/saker/ny"
-        className="mt-8 inline-block text-sm rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-700"
+        className="mt-8 inline-block rounded-md bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-700"
       >
         Opprett sak
       </a>

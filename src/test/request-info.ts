@@ -5,7 +5,7 @@ export function lagRequestInfo(url: string, params: Record<string, string> = {})
     request: new Request(url),
     path: new URL(url).pathname,
     params,
-    ctx: {},
+    ctx: { user: null, session: null },
     rw: {
       nonce: "test-nonce",
       Document: ({ children }) => children,

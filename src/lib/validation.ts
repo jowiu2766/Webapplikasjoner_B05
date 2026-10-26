@@ -34,7 +34,7 @@ export function validateStatus(caseStatuses: CaseStatus) {
 }
 
 // Deadline
-export function validateDeadline(deadline: Date) {
+export function validateDeadline(deadline: Date | string) {
   const today = new Date();
   const deadlineDate = new Date(deadline);
   if (!deadline) {

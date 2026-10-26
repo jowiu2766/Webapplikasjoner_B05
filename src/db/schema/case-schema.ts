@@ -3,7 +3,6 @@ import { user } from "./auth-schema";
 import { createId } from "@/lib/id";
 import { caseCategories, casePriorities, caseStatuses } from "@/lib/enums";
 
-// en sak
 export const cases = sqliteTable(
   "cases",
   {
@@ -14,33 +13,25 @@ export const cases = sqliteTable(
     description: text("description").notNull(),
     category: text("category", { enum: caseCategories }).notNull(),
     priority: text("priority", { enum: casePriorities }).notNull(),
-    deadline: integer("deadline", { mode: "timestamp" }).notNull(),
     status: text("status", { enum: caseStatuses }).notNull().default("open"),
+    deadline: integer("deadline", { mode: "timestamp" }).notNull(),
     tenantId: text("tenant_id")
-  .notNull()
-  .references(() => user.id),
-
-landlordId: text("landlord_id")
-  .notNull()
-  .references(() => user.id),
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    landlordId: text("landlord_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .$default(() => new Date()),
-
-      deadline: integer("deadline", {
-  mode: "timestamp",
-}),
-
-updatedAt: integer("updated_at", {
-  mode: "timestamp",
-})
-  .notNull()
-  .$default(() => new Date()),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .$default(() => new Date()),
   },
   (table) => [
     index("idx_cases_tenant_id").on(table.tenantId),
     index("idx_cases_landlord_id").on(table.landlordId),
-  ],
+  ]
 );
 
 export type Case = typeof cases.$inferSelect;

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { db } from "@/db";
-import { cases, users } from "@/db/schema";
+import { cases, user } from "@/db/schema";
 import { avbrytSak, oppdaterStatus, sendMelding } from "../saker";
-import { seedParter, tomDb } from "@/test/db";
+import { nySak, seedParter, tomDb } from "@/test/db";
 
 vi.mock("@/db", async () => ({ db: (await import("@/test/db")).lagTestDb() }));
 
@@ -20,7 +20,7 @@ async function meldInnSak() {
   const { leietaker, utleier } = await seedParter(db);
   const [sak] = await db
     .insert(cases)
-    .values({ title: "Vannlekkasje", description: "x", category: "pipes", priority: "high", tenantId: leietaker.id, landlordId: utleier.id })
+    .values(nySak(leietaker.id, utleier.id))
     .returning();
   return { sak, leietaker, utleier };
 }
@@ -49,7 +49,7 @@ describe("sendMelding", () => {
   });
 
   it("avviser en som ikke er part i saken", async () => {
-    await db.insert(users).values({ name: "Nina Nabo", email: "nina@example.com", role: "tenant" });
+    await db.insert(user).values({ id: "nina", name: "Nina Nabo", email: "nina@example.com", role: "tenant" });
     const { sak } = await meldInnSak();
 
     expect(await sendMelding(sak.id, "Hei")).toEqual({ ok: false, error: "Ingen tilgang til saken" });

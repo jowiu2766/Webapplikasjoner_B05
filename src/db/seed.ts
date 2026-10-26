@@ -1,108 +1,81 @@
 // Testdata. Kjør med:
-//   npm run seed      (eller pnpm seed)
+//   npm run seed
 //
-// Oppretter to demobrukere og fire eksempelsaker.
-// Bruker faste ID-er for å unngå duplikater.
-// Skal bare brukes i utviklingsmiljøet.
+// Tømmer og fyller på nytt, så databasen kan nullstilles til en kjent
+// tilstand. Slett .wrangler/, kjør migrasjonene og denne, så er du tilbake
+// der du startet.
 import { defineScript } from "rwsdk/worker";
 import { drizzle } from "drizzle-orm/d1";
-import { user, cases } from "./schema";
-import { users, tasks, cases, messages } from "./schema";
+import { account, cases, messages, session, user, verification } from "./schema";
 
 export const seedData = async (env: Env) => {
   const db = drizzle(env.DB);
 
-  // Seed skal ikke slette ekte brukere eller saker.
-// Vi bruker faste demo-ID-er og unngår duplikater.
-const leietakerId = "demo-leietaker";
-const utleierId = "demo-utleier";
-const now = new Date();
-  // Tøm først, så seed kan kjøres om igjen uten å doble alt.
-  // barna før foreldrene
+  // Barna før foreldrene.
   await db.delete(messages);
   await db.delete(cases);
-  await db.delete(tasks);
-  await db.delete(users);
+  await db.delete(session);
+  await db.delete(account);
+  await db.delete(verification);
+  await db.delete(user);
 
-  // Brukerne må inn før sakene: fremmednøkkelen krever at brukeren finnes.
-  // Databasen nekter hvis dere tar rekkefølgen feil, og det er en god ting.
-  
-await db.insert(user).values([
-  {
-    id: leietakerId,
-    name: "Kari Nordmann",
-    email: "kari@example.com",
-    emailVerified: false,
-    role: "tenant",
-    createdAt: now,
-    updatedAt: now,
-  },
-  {
-    id: utleierId,
-    name: "Ola Utleier",
-    email: "ola@example.com",
-    emailVerified: false,
-    role: "landlord",
-    createdAt: now,
-    updatedAt: now,
-  },
-]).onConflictDoNothing();
+  const [leietaker, utleier] = await db
+    .insert(user)
+    .values([
+      { id: "demo-leietaker", name: "Kari Nordmann", email: "kari@example.com", role: "tenant" },
+      { id: "demo-utleier", name: "Ola Utleier", email: "ola@example.com", role: "landlord" },
+    ])
+    .returning();
 
-
-  // fire saker med ulik status og prioritet
   const dag = 86_400_000;
   const [lekkasje] = await db
     .insert(cases)
     .values([
-    {
-      title: "Vannlekkasje under kjøkkenvasken",
-      description:
-        "Det drypper fra røret under vasken. Har satt en bøtte under.",
-      category: "pipes",
-      description: "Det drypper fra røret under vasken. Har satt en bøtte under.",
-      category: "pipes", 
-      priority: "high",
-      deadline: new Date(Date.now() + 3 * dag),
-      status: "open",
-      tenantId: leietakerId,
-      landlordId: utleierId,
-      createdAt: new Date(Date.now() - 1 * dag),
-    },
-    {
-      title: "Stikkontakten på badet virker ikke",
-      description: "Ingen strøm i kontakten ved speilet. Sikringen er sjekket.",
-      category: "electricity",
-      priority: "medium",
-      deadline: new Date(Date.now() + 5 * dag),
-      status: "in_progress",
-      tenantId: leietakerId,
-      landlordId: utleierId,
-      createdAt: new Date(Date.now() - 5 * dag),
-    },
-    {
-      title: "Maur i kjøkkenskapet",
-      description: "Små svarte maur kommer inn ved vinduet over benken.",
-      category: "pests",
-      priority: "low",
-      deadline: new Date(Date.now() + 12 * dag),
-      status: "pending",
-      tenantId: leietakerId,
-      landlordId: utleierId,
-      createdAt: new Date(Date.now() - 12 * dag),
-    },
-    {
-      title: "Dørlåsen henger",
-      description: "Nøkkelen må vris hardt for å få opp ytterdøra.",
-      category: "maintenance",
-      deadline: new Date(Date.now() + 2 * dag),
-      priority: "medium",
-      status: "closed",
-      tenantId: leietakerId,
-      landlordId: utleierId,
-      createdAt: new Date(Date.now() - 30 * dag),
-    },
-  ]).onConflictDoNothing();
-  ])
+      {
+        title: "Vannlekkasje under kjøkkenvasken",
+        description: "Det drypper fra røret under vasken. Har satt en bøtte under.",
+        category: "pipes",
+        priority: "high",
+        status: "open",
+        deadline: new Date(Date.now() + 3 * dag),
+        tenantId: leietaker.id,
+        landlordId: utleier.id,
+        createdAt: new Date(Date.now() - 1 * dag),
+      },
+      {
+        title: "Stikkontakten på badet virker ikke",
+        description: "Ingen strøm i kontakten ved speilet. Sikringen er sjekket.",
+        category: "electricity",
+        priority: "medium",
+        status: "in_progress",
+        deadline: new Date(Date.now() + 5 * dag),
+        tenantId: leietaker.id,
+        landlordId: utleier.id,
+        createdAt: new Date(Date.now() - 5 * dag),
+      },
+      {
+        title: "Maur i kjøkkenskapet",
+        description: "Små svarte maur kommer inn ved vinduet over benken.",
+        category: "pests",
+        priority: "low",
+        status: "pending",
+        deadline: new Date(Date.now() + 14 * dag),
+        tenantId: leietaker.id,
+        landlordId: utleier.id,
+        createdAt: new Date(Date.now() - 12 * dag),
+      },
+      {
+        title: "Dørlåsen henger",
+        description: "Nøkkelen må vris hardt for å få opp ytterdøra.",
+        category: "maintenance",
+        priority: "medium",
+        status: "closed",
+        deadline: new Date(Date.now() - 20 * dag),
+        tenantId: leietaker.id,
+        landlordId: utleier.id,
+        createdAt: new Date(Date.now() - 30 * dag),
+      },
+    ])
     .returning();
 
   await db.insert(messages).values([

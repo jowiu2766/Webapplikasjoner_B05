@@ -25,8 +25,8 @@ export function kanAvbryteSak(status: CaseStatus, rolle: UserRole) {
 }
 
 export function harTilgang(
-  bruker: { id: number },
-  sak: { tenantId: number; landlordId: number }
+  bruker: { id: string },
+  sak: { tenantId: string; landlordId: string }
 ) {
   return bruker.id === sak.tenantId || bruker.id === sak.landlordId;
 }

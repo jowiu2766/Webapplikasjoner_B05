@@ -5,7 +5,7 @@ import { SessionDTO, UserDTO, AuthResponseDTO } from "../schema/auth-dtos";
 export function mapUserToDTO(user: SafeUser): UserDTO{
     return{
         id: user.id,
-        username: user.username,
+        name: user.name,
         email: user.email,
         role: user.role,
         isActive: user.isActive,

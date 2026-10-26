@@ -6,7 +6,6 @@ import type { SafeUser } from "@/db/schema";
 export interface AuthContextType{
     user: SafeUser | null;
     isAuthenticated: boolean;
-    isAdmin: boolean;
     login: (user: SafeUser) => void;
     logout: () => void;
 }
@@ -30,7 +29,7 @@ export function AuthProvider({children, initialUser = null}: AuthProviderProps){
         if(typeof window !== "undefined") window.location.href ="/auth/login";
     }, [])
 
-    const value: AuthContextType = {user, isAuthenticated: !!user, isAdmin: user?.role ==="Admin", login, logout}
+    const value: AuthContextType = {user, isAuthenticated: !!user, login, logout}
 
     return <AuthContext value={value}>{children}</AuthContext>
 }

@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 import { db } from "@/db";
 import { cases } from "@/db/schema";
 import { SakerList } from "../List";
-import { seedParter, tomDb } from "@/test/db";
+import { nySak, seedParter, tomDb } from "@/test/db";
 import { lagRequestInfo } from "@/test/request-info";
 
 vi.mock("@/db", async () => ({ db: (await import("@/test/db")).lagTestDb() }));
@@ -15,15 +15,7 @@ async function visSide(url: string) {
 
 async function meldInnSak(title: string, status: "open" | "closed" = "open") {
   const { leietaker, utleier } = await seedParter(db);
-  await db.insert(cases).values({
-    title,
-    description: "Det drypper fra røret under vasken.",
-    category: "pipes",
-    priority: "high",
-    status,
-    tenantId: leietaker.id,
-    landlordId: utleier.id,
-  });
+  await db.insert(cases).values(nySak(leietaker.id, utleier.id, { title, status }));
 }
 
 describe("/saker", () => {

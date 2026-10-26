@@ -1,8 +1,9 @@
 import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm/_relations";
-import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { userRoles } from "@/lib/enums";
 
-//User schema 
+// Tabellene better-auth eier: user, session, account og verification.
+// Egne kolonner på user: role, address, isActive og lastLoginAt.
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -10,18 +11,19 @@ export const user = sqliteTable("user", {
   emailVerified: integer("email_verified", { mode: "boolean" })
     .default(false)
     .notNull(),
-  passwordHash: text("password_hash").notNull(),
-  role: text("role", { enum: ["Unauthenticated", "Tenant", "Landlord", "Admin"] }).notNull().default("Unauthenticated"),
+  // Brukes av den hånd-rullede innloggingen. better-auth lagrer passordet i account.
+  passwordHash: text("password_hash"),
+  role: text("role", { enum: userRoles }).notNull().default("tenant"),
   image: text("image"),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp_ms" })
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-    .$onUpdate(() =>  new Date())
+    .$onUpdate(() => new Date())
     .notNull(),
-  lastLoginAt: integer("last_login_at", {mode: "timestamp_ms"}),
-  isActive: integer("is_active", {mode: "boolean"}).notNull().default(true),
+  lastLoginAt: integer("last_login_at", { mode: "timestamp_ms" }),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
   address: text("address"),
 });
 
@@ -59,18 +61,15 @@ export const account = sqliteTable(
     accessToken: text("access_token"),
     refreshToken: text("refresh_token"),
     idToken: text("id_token"),
-    accessTokenExpiresAt: integer("access_token_expires_at", {
-      mode: "timestamp_ms",
-    }),
-    refreshTokenExpiresAt: integer("refresh_token_expires_at", {
-      mode: "timestamp_ms",
-    }),
+    accessTokenExpiresAt: integer("access_token_expires_at", { mode: "timestamp_ms" }),
+    refreshTokenExpiresAt: integer("refresh_token_expires_at", { mode: "timestamp_ms" }),
     scope: text("scope"),
     password: text("password"),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .$defaultFn(() => new Date())
       .$onUpdate(() => new Date())
       .notNull(),
   },
@@ -95,16 +94,7 @@ export const verification = sqliteTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
-export const sessionsRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
-}));
-
-//Utledelses schema
 export type User = typeof user.$inferSelect;
 export type CreateUser = typeof user.$inferInsert;
 export type Session = typeof session.$inferSelect;
-export type UserRole = "Unauthenticated" | "Tenant" | "Landlord" | "Admin";
-export type SafeUser = Omit<typeof user.$inferInsert,"passwordHash">
+export type SafeUser = Omit<User, "passwordHash">;

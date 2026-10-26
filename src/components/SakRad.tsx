@@ -1,7 +1,4 @@
 import type { ReactNode } from "react";
-import type { Case } from "@/db/schema";
-import type { User } from "@/db/schema/auth-schema";
-import { categoryLabels, priorityLabels, statusLabels } from "@/lib/enums";
 import type { Case, User } from "@/db/schema";
 import { categoryLabels, priorityLabels, statusLabels, type UserRole } from "@/lib/enums";
 

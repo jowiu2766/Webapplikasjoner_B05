@@ -132,7 +132,7 @@ export function RegisterForm() {
                   id="role-tenant"
                   name="role"
                   type="radio"
-                  value="Tenant"
+                  value="tenant"
                   className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
                 />
                 <label htmlFor="role-tenant" className="ml-3 block text-sm text-gray-700">
@@ -144,7 +144,7 @@ export function RegisterForm() {
                   id="role-landlord"
                   name="role"
                   type="radio"
-                  value="Landlord"
+                  value="landlord"
                   className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
                 />
                 <label htmlFor="role-landlord" className="ml-3 block text-sm text-gray-700">

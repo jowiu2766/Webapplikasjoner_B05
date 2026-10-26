@@ -2,9 +2,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { db } from "@/db";
-import { cases, messages, users } from "@/db/schema";
+import { cases, messages, user } from "@/db/schema";
 import { SakDetalj } from "../Detail";
-import { seedParter, tomDb } from "@/test/db";
+import { nySak, seedParter, tomDb } from "@/test/db";
 import { lagRequestInfo } from "@/test/request-info";
 
 vi.mock("@/db", async () => ({ db: (await import("@/test/db")).lagTestDb() }));
@@ -25,14 +25,7 @@ async function meldInnSak() {
   const { leietaker, utleier } = await seedParter(db);
   const [sak] = await db
     .insert(cases)
-    .values({
-      title: "Vannlekkasje under kjøkkenvasken",
-      description: "Det drypper fra røret under vasken.",
-      category: "pipes",
-      priority: "high",
-      tenantId: leietaker.id,
-      landlordId: utleier.id,
-    })
+    .values(nySak(leietaker.id, utleier.id))
     .returning();
   return { sak, leietaker, utleier };
 }
@@ -77,7 +70,7 @@ describe("/saker/:id", () => {
 
   it("en som ikke er part i saken får 403", async () => {
     // Den første utleieren i databasen blir «innlogget» med ?rolle=landlord.
-    await db.insert(users).values({ name: "Per Utleier", email: "per@example.com", role: "landlord" });
+    await db.insert(user).values({ id: "per", name: "Per Utleier", email: "per@example.com", role: "landlord" });
     const { sak } = await meldInnSak();
 
     const info = await visSak("landlord", sak.id);
