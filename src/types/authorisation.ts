@@ -4,13 +4,13 @@ export interface AuthContext{
     user: SafeUser | null;
     session: Session | null;
 }
-
 export interface LoginCredentials{
-    username: string; password: string;
+    username: string; 
+    password: string;
 
 }
-
 export interface RegisterCredentials{
-    username: string; email: string; password: string;
-
+    username: string; 
+    email: string; 
+    password: string;
 }
