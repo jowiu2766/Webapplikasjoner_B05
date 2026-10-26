@@ -22,6 +22,7 @@ export function listSaker(bruker: User, filter: SakFilter = {}) {
 export async function createCase(data: CreateCase): Promise<Case> {
   const [newCase] = await db.insert(cases).values(data).returning();
   return newCase;
+}
 export function hentSak(id: string) {
   return db.query.cases.findFirst({
     where: { id },
@@ -48,3 +49,4 @@ export async function settStatus(id: string, status: CaseStatus) {
     .returning();
   return sak;
 }
+
