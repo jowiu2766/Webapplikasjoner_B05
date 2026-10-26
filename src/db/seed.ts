@@ -1,16 +1,22 @@
 // Testdata. Kjør med:
 //   npm run seed      (eller pnpm seed)
 //
-// Poenget med en seed er at databasen kan nullstilles til en kjent tilstand.
-// Slett .wrangler/, kjør migrasjonene og denne, så er dere tilbake der dere
-// startet. Da slipper dere å lure på om feilen ligger i dataene.
+// Oppretter to demobrukere og fire eksempelsaker.
+// Bruker faste ID-er for å unngå duplikater.
+// Skal bare brukes i utviklingsmiljøet.
 import { defineScript } from "rwsdk/worker";
 import { drizzle } from "drizzle-orm/d1";
+import { user, cases } from "./schema";
 import { users, tasks, cases, messages } from "./schema";
 
 export const seedData = async (env: Env) => {
   const db = drizzle(env.DB);
 
+  // Seed skal ikke slette ekte brukere eller saker.
+// Vi bruker faste demo-ID-er og unngår duplikater.
+const leietakerId = "demo-leietaker";
+const utleierId = "demo-utleier";
+const now = new Date();
   // Tøm først, så seed kan kjøres om igjen uten å doble alt.
   // barna før foreldrene
   await db.delete(messages);
@@ -20,28 +26,28 @@ export const seedData = async (env: Env) => {
 
   // Brukerne må inn før sakene: fremmednøkkelen krever at brukeren finnes.
   // Databasen nekter hvis dere tar rekkefølgen feil, og det er en god ting.
-  const [leietaker, utleier] = await db
-    .insert(users)
-    .values([
-      { name: "Kari Nordmann", email: "kari@example.com", role: "tenant" },
-      { name: "Ola Utleier", email: "ola@example.com", role: "landlord" },
-    ])
-    .returning();
+  
+await db.insert(user).values([
+  {
+    id: leietakerId,
+    name: "Kari Nordmann",
+    email: "kari@example.com",
+    emailVerified: false,
+    role: "tenant",
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: utleierId,
+    name: "Ola Utleier",
+    email: "ola@example.com",
+    emailVerified: false,
+    role: "landlord",
+    createdAt: now,
+    updatedAt: now,
+  },
+]).onConflictDoNothing();
 
-  await db.insert(tasks).values([
-    {
-      title: "Lese leksjonen før timen",
-      completed: true,
-      userId: leietaker.id,
-      dueDate: new Date(Date.now() - 86_400_000),
-    },
-    {
-      title: "Sette opp prosjektet",
-      completed: false,
-      userId: leietaker.id,
-      dueDate: new Date(Date.now() + 86_400_000),
-    },
-  ]);
 
   // fire saker med ulik status og prioritet
   const dag = 86_400_000;
@@ -51,11 +57,11 @@ export const seedData = async (env: Env) => {
     {
       title: "Vannlekkasje under kjøkkenvasken",
       description: "Det drypper fra røret under vasken. Har satt en bøtte under.",
-      category: "pipes",
+      category: "pipes", 
       priority: "high",
       status: "open",
-      tenantId: leietaker.id,
-      landlordId: utleier.id,
+      tenantId: leietakerId,
+      landlordId: utleierId,
       createdAt: new Date(Date.now() - 1 * dag),
     },
     {
@@ -64,8 +70,8 @@ export const seedData = async (env: Env) => {
       category: "electricity",
       priority: "medium",
       status: "in_progress",
-      tenantId: leietaker.id,
-      landlordId: utleier.id,
+      tenantId: leietakerId,
+      landlordId: utleierId,
       createdAt: new Date(Date.now() - 5 * dag),
     },
     {
@@ -74,8 +80,8 @@ export const seedData = async (env: Env) => {
       category: "pests",
       priority: "low",
       status: "pending",
-      tenantId: leietaker.id,
-      landlordId: utleier.id,
+      tenantId: leietakerId,
+      landlordId: utleierId,
       createdAt: new Date(Date.now() - 12 * dag),
     },
     {
@@ -84,10 +90,11 @@ export const seedData = async (env: Env) => {
       category: "maintenance",
       priority: "medium",
       status: "closed",
-      tenantId: leietaker.id,
-      landlordId: utleier.id,
+      tenantId: leietakerId,
+      landlordId: utleierId,
       createdAt: new Date(Date.now() - 30 * dag),
     },
+  ]).onConflictDoNothing();
   ])
     .returning();
 
