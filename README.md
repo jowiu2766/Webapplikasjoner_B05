@@ -44,8 +44,7 @@ src/
 │  ├─ styles.css           én linje: @import "tailwindcss"
 │  └─ pages/Home.tsx       forsiden. En server-komponent
 ├─ components/
-│  ├─ Counter.tsx          en klient-komponent ("use client")
-│  ├─ TimeClient.tsx       samme klokke, men rendret i nettleseren
+│  ├─ MeldingForm.tsx      en klient-komponent ("use client")
 │  └─ __tests__/           komponenttest med Testing Library
 ├─ db/
 │  ├─ schema/              tabellene. Eksempel: users og tasks, skal byttes ut
@@ -115,7 +114,7 @@ linja helt øverst:
 // @vitest-environment happy-dom
 ```
 
-Se `src/components/__tests__/Counter.test.tsx` for et eksempel med klikk.
+Se `src/components/__tests__/MeldingForm.test.tsx` for et eksempel med klikk.
 
 **Playwright** starter en ekte nettleser og klikker seg gjennom appen. Tregere,
 så bruk den på de viktige flytene.

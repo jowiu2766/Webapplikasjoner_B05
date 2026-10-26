@@ -1,5 +1,5 @@
 import type { RequestInfo } from "rwsdk/worker";
-import { db } from "@/db";
+import { midlertidigBruker } from "@/db/queries/bruker";
 import { listSaker } from "@/db/queries/saker";
 import { parseSakFilter } from "@/lib/sak-filter";
 import {
@@ -23,6 +23,7 @@ export async function SakerList({ request }: RequestInfo) {
   const rolle =
     url.searchParams.get("rolle") === "landlord" ? "landlord" : "tenant";
   const bruker = await db.query.users.findFirst({ where: { role: rolle } });
+  const bruker = await midlertidigBruker(request);
   if (!bruker) {
     return (
       <main className="mx-auto max-w-4xl p-8 font-sans">
@@ -34,6 +35,7 @@ export async function SakerList({ request }: RequestInfo) {
   }
 
   const erUtleier = bruker.role === "landlord";
+  const rolle = bruker.role;
   const saker = await listSaker(bruker, filter);
 
   const selectClass = "mt-1 rounded-md border border-slate-300 px-3 py-2";
@@ -120,7 +122,7 @@ export async function SakerList({ request }: RequestInfo) {
           </thead>
           <tbody className="block space-y-3 md:table-row-group md:space-y-0">
             {saker.map((sak) => (
-              <SakRad key={sak.id} sak={sak} visLeietaker={erUtleier} />
+              <SakRad key={sak.id} sak={sak} rolle={rolle} visLeietaker={erUtleier} />
             ))}
           </tbody>
         </table>

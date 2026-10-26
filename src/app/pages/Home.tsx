@@ -1,54 +1,58 @@
-import { Counter } from "@/components/Counter";
-import { TimeClient } from "@/components/TimeClient";
+import type { ReactNode } from "react";
 
-/**
- * En server-komponent. Den kjører på serveren, én gang per forespørsel, og
- * nettleseren får ferdig HTML. Derfor viser klokka under tidspunktet på
- * serveren, og den endrer seg bare når du laster siden på nytt.
- *
- * Server-komponent er standarden i RedwoodSDK. Trenger du klikk eller state,
- * lager du en klient-komponent, som `TimeClient` og `Counter` under.
- */
+// Rollevalget er midlertidig til innlogging er på plass.
 export function Home() {
-  const now = new Date().toLocaleString("no-NO");
-
   return (
-    <main className="mx-auto max-w-2xl p-8 font-sans">
+    <main className="mx-auto max-w-4xl p-8 font-sans">
       <h1 className="text-3xl font-bold">Fiksa</h1>
-      <p className="mt-2 text-slate-600">
-        Fiksa samler dialogen mellom leietaker og utleier på ett sted.
-        Startprosjektet virker.
+      <p className="mt-2 max-w-prose text-lg text-slate-600">
+        Fiksa samler dialogen mellom leietaker og utleier på ett sted. Meld inn
+        det som må fikses, følg saken og snakk sammen om den til den er løst.
       </p>
 
-      <p className="mt-6 text-sm text-slate-500">
-        Rendret på serveren {now}. Last siden på nytt, så endrer tallet seg.
-      </p>
+      <div className="mt-8 flex flex-wrap gap-3">
+        <a
+          href="/saker/ny"
+          className="rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-700"
+        >
+          Opprett sak
+        </a>
+        <a
+          href="/saker?rolle=tenant"
+          className="rounded-md border border-slate-300 px-4 py-2 hover:bg-slate-50"
+        >
+          Mine saker
+        </a>
+        <a
+          href="/saker?rolle=landlord"
+          className="rounded-md border border-slate-300 px-4 py-2 hover:bg-slate-50"
+        >
+          Saker sendt til meg
+        </a>
+      </div>
 
-      {/* Samme klokke, men rendret i nettleseren. Ser dere to ulike tidspunkt,
-          har dere sett forskjellen på server og klient med egne øyne. */}
-      <TimeClient />
-
-      <Counter />
-
-      <button>
-        {" "}
-        <a href="/saker/ny">Opprett sak</a>
-      </button>
-
-      <h2 className="mt-10 text-xl font-semibold">Prøv dette</h2>
-      <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-700">
-        <li>
-          Åpne{" "}
-          <a className="underline" href="/api/status">
-            /api/status
-          </a>
-          . Det er en rute som svarer JSON i stedet for HTML.
-        </li>
-        <li>
-          Endre teksten i src/app/pages/Home.tsx og se at siden oppdaterer seg.
-        </li>
-        <li>Trykk på knappen over. Den er en klient-komponent.</li>
-      </ul>
+      <h2 className="mt-12 text-xl font-semibold">Slik virker det</h2>
+      <ol className="mt-4 grid gap-4 md:grid-cols-3">
+        <Steg nr={1} tittel="Meld inn">
+          Leietaker beskriver problemet, velger kategori og hvor mye det haster.
+        </Steg>
+        <Steg nr={2} tittel="Følg opp">
+          Utleier ser saken i lista si og flytter den fram: under arbeid, venter, lukket.
+        </Steg>
+        <Steg nr={3} tittel="Snakk sammen">
+          Begge skriver meldinger på saken, så alt om den ligger på ett sted.
+        </Steg>
+      </ol>
     </main>
+  );
+}
+
+function Steg({ nr, tittel, children }: { nr: number; tittel: string; children: ReactNode }) {
+  return (
+    <li className="rounded-lg border border-slate-200 p-4">
+      <p className="text-sm text-slate-500">Steg {nr}</p>
+      <p className="mt-1 font-medium">{tittel}</p>
+      <p className="mt-1 text-sm text-slate-600">{children}</p>
+    </li>
   );
 }
