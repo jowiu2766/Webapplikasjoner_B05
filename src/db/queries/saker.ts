@@ -1,9 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { Case, cases, type CreateCase, type User } from "@/db/schema";
-import type { User } from "@/db/schema/auth-schema";
-import { cases, messages } from "@/db/schema";
-import type { CreateMessage, User } from "@/db/schema";
 import type { CaseStatus } from "@/lib/enums";
 import type { SakFilter } from "@/lib/sak-filter";
 
