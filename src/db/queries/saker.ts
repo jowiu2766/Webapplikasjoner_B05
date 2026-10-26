@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
+import { Case, cases, type CreateCase, type User } from "@/db/schema";
 import type { User } from "@/db/schema/auth-schema";
 import { cases, messages } from "@/db/schema";
 import type { CreateMessage, User } from "@/db/schema";
@@ -20,6 +21,10 @@ export function listSaker(bruker: User, filter: SakFilter = {}) {
   });
 }
 
+// oppretter sak, sak havner i sakslisten
+export async function createCase(data: CreateCase): Promise<Case> {
+  const [newCase] = await db.insert(cases).values(data).returning();
+  return newCase;
 export function hentSak(id: string) {
   return db.query.cases.findFirst({
     where: { id },

@@ -14,6 +14,7 @@ export const cases = sqliteTable(
     description: text("description").notNull(),
     category: text("category", { enum: caseCategories }).notNull(),
     priority: text("priority", { enum: casePriorities }).notNull(),
+    deadline: integer("deadline", { mode: "timestamp" }).notNull(),
     status: text("status", { enum: caseStatuses }).notNull().default("open"),
     tenantId: text("tenant_id")
   .notNull()
@@ -39,7 +40,7 @@ updatedAt: integer("updated_at", {
   (table) => [
     index("idx_cases_tenant_id").on(table.tenantId),
     index("idx_cases_landlord_id").on(table.landlordId),
-  ]
+  ],
 );
 
 export type Case = typeof cases.$inferSelect;

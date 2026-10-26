@@ -3,6 +3,8 @@ import { layout, render, route } from "rwsdk/router";
 import { Document } from "@/app/Document";
 import { setCommonHeaders } from "@/app/headers";
 import { Home } from "@/app/pages/Home";
+import { SakerList } from "@/app/pages/saker/List";
+import { NewCase } from "./app/pages/saker/NewCase";
 import { AppLayout } from "./app/pages/layouts/AppLayout";
 //import { TestStateSceeen } from "@/app/pages/Screens/TestStateScreen";
 import { headers } from "happy-dom/lib/PropertySymbol";

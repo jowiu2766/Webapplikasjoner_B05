@@ -25,6 +25,9 @@ export function SakRad({
       </td>
       <Celle etikett="Kategori">{categoryLabels[sak.category]}</Celle>
       <Celle etikett="Prioritet">{priorityLabels[sak.priority]}</Celle>
+      <Celle etikett="Tidsfrist">
+        {sak.deadline.toLocaleDateString("no-NO")}
+      </Celle>
       <Celle etikett="Status">{statusLabels[sak.status]}</Celle>
       {visLeietaker && <Celle etikett="Leietaker">{sak.tenant.name}</Celle>}
       <Celle etikett="Opprettet">
@@ -34,7 +37,13 @@ export function SakRad({
   );
 }
 
-function Celle({ etikett, children }: { etikett: string; children: ReactNode }) {
+function Celle({
+  etikett,
+  children,
+}: {
+  etikett: string;
+  children: ReactNode;
+}) {
   return (
     <td className="block md:table-cell md:py-3 md:pr-4">
       <span className="text-slate-500 md:hidden">{etikett}: </span>
