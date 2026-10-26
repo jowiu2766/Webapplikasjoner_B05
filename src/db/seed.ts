@@ -7,6 +7,7 @@
 import { defineScript } from "rwsdk/worker";
 import { drizzle } from "drizzle-orm/d1";
 import { user, cases } from "./schema";
+import { users, tasks, cases, messages } from "./schema";
 
 export const seedData = async (env: Env) => {
   const db = drizzle(env.DB);
@@ -16,6 +17,12 @@ export const seedData = async (env: Env) => {
 const leietakerId = "demo-leietaker";
 const utleierId = "demo-utleier";
 const now = new Date();
+  // Tøm først, så seed kan kjøres om igjen uten å doble alt.
+  // barna før foreldrene
+  await db.delete(messages);
+  await db.delete(cases);
+  await db.delete(tasks);
+  await db.delete(users);
 
   // Brukerne må inn før sakene: fremmednøkkelen krever at brukeren finnes.
   // Databasen nekter hvis dere tar rekkefølgen feil, og det er en god ting.
@@ -44,7 +51,9 @@ await db.insert(user).values([
 
   // fire saker med ulik status og prioritet
   const dag = 86_400_000;
-  await db.insert(cases).values([
+  const [lekkasje] = await db
+    .insert(cases)
+    .values([
     {
       title: "Vannlekkasje under kjøkkenvasken",
       description: "Det drypper fra røret under vasken. Har satt en bøtte under.",
@@ -86,6 +95,23 @@ await db.insert(user).values([
       createdAt: new Date(Date.now() - 30 * dag),
     },
   ]).onConflictDoNothing();
+  ])
+    .returning();
+
+  await db.insert(messages).values([
+    {
+      caseId: lekkasje.id,
+      senderId: utleier.id,
+      body: "Takk, jeg ringer rørleggeren i morgen tidlig.",
+      createdAt: new Date(Date.now() - 1 * dag + 3_600_000),
+    },
+    {
+      caseId: lekkasje.id,
+      senderId: leietaker.id,
+      body: "Flott. Jeg er hjemme etter klokka 15.",
+      createdAt: new Date(Date.now() - 1 * dag + 7_200_000),
+    },
+  ]);
 
   console.log("Seeding ferdig");
 };

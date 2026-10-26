@@ -11,6 +11,11 @@ import { user } from "./auth-schema";
 import { createId } from "@/lib/id";
 
 // En melding tilhører én sak og har én avsender.
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { cases } from "./case-schema";
+import { users } from "./user-schema";
+import { createId } from "@/lib/id";
+
 export const messages = sqliteTable(
   "messages",
   {
@@ -38,6 +43,18 @@ export const messages = sqliteTable(
     index("idx_messages_case_id").on(table.caseId),
     index("idx_messages_sender_id").on(table.senderId),
   ]
+    caseId: text("case_id")
+      .notNull()
+      .references(() => cases.id, { onDelete: "cascade" }),
+    senderId: integer("sender_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .$default(() => new Date()),
+  },
+  (table) => [index("idx_messages_case_id").on(table.caseId)]
 );
 
 export type Message = typeof messages.$inferSelect;

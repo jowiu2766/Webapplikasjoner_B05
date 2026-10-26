@@ -44,6 +44,19 @@ export const relations = defineRelations(schema, (r) => ({
   from: r.cases.id,
   to: r.messages.caseId,
 }),
+    messages: r.many.messages({ from: r.cases.id, to: r.messages.caseId }),
+  },
+  messages: {
+    case: r.one.cases({
+      from: r.messages.caseId,
+      to: r.cases.id,
+      optional: false,
+    }),
+    sender: r.one.users({
+      from: r.messages.senderId,
+      to: r.users.id,
+      optional: false,
+    }),
   },
   messages: {
   case: r.one.cases({

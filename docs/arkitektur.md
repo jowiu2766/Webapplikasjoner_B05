@@ -91,7 +91,7 @@ Forslag: verdiene lagres på engelsk, som i UML-en, og vises på norsk. Begge de
 | awaiting_confirmation | Venter på bekreftelse |
 | closed | Lukket |
 
-Lovlige overganger (UML «updateStatus», «cancelCase»): open → in_progress → pending → awaiting_confirmation → closed, pluss open → closed når leietakeren trekker saken. Bare utleier endrer status, leietaker kan bare trekke egen åpen sak.
+Lovlige overganger (UML «updateStatus», «cancelCase»): open → in_progress → pending → awaiting_confirmation → closed, pluss open → closed når leietakeren avbryter saken. Bare utleier endrer status, leietaker kan bare avbryte egen åpen sak.
 
 ### Utsatt fra UML-en, ikke v1
 

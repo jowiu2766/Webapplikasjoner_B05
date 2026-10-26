@@ -22,6 +22,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"),
+      // Finnes bare i workerd, se src/test/cloudflare-workers.ts.
+      "cloudflare:workers": resolve(__dirname, "src/test/cloudflare-workers.ts"),
     },
   },
   test: {
