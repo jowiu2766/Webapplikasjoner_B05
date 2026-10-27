@@ -16,8 +16,8 @@ export const RegisterDTOSchema = z.object({
 //user DTO for response(never incluides password hash)
 export const UserDTOSchema = z.object({
     id: z.coerce.string(),
-    username: z.string().trim(),
-    email: z.string().trim(),
+    name: z.string().trim(),
+    email: z.string().trim().email(),
     role: z.enum(["Unauthenticated" , "Tenant" , "Landlord" , "Admin"]),
     isActive: z.boolean(),
     lastLoginAt: z.date().nullable(),
@@ -29,7 +29,7 @@ export const UserDTOSchema = z.object({
 //Session DTO
 export const SessionDTOSchema = z.object({
     id: z.string(),
-    userId: z.coerce.number(),
+    userId: z.coerce.string(),
     expiresAt: z.date(),
     createdAt: z.date(),
 });

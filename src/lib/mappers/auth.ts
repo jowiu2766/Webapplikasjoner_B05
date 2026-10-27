@@ -12,6 +12,7 @@ export function mapUserToDTO(user: SafeUser): UserDTO{
         lastLoginAt: user.lastLoginAt,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
+        address: user.address
     };
 }
 
