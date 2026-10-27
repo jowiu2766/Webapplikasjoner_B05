@@ -1,11 +1,13 @@
 import type { RequestInfo } from "rwsdk/worker";
+import type { DB } from "@/db";
+import type { TestDb } from "@/test/db";
 
-export function lagRequestInfo(url: string, params: Record<string, string> = {}): RequestInfo {
+export function lagRequestInfo(url: string, db: TestDb,  params: Record<string, string> = {}): RequestInfo {
   return {
     request: new Request(url),
     path: new URL(url).pathname,
     params,
-    ctx: { user: null, session: null },
+    ctx: {db: db as unknown as DB, user: null, session: null },
     rw: {
       nonce: "test-nonce",
       Document: ({ children }) => children,
