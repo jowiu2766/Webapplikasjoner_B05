@@ -1,24 +1,24 @@
 import {getDb} from "@/db";
 import { createId } from "../id";
-import { SafeUser, Session, sessions, user } from "@/db/schema";
+import { SafeUser, Session, session, user } from "@/db/schema";
 import { ResultHandler } from "../utils/result";
 import {Result} from "@/types/result";
 import {Errors} from "@/types/errors";
-import { eq, and, gt, lt } from "drizzle-orm";
+import { eq, and, gt, lt, getColumns } from "drizzle-orm";
 
 
 const SESSION_DURATION = 7 * 24 * 60 * 60 *1000; //7 days
 export const SESSION_COOKIE_NAME = "fika_session_cookie";
 
 //Create new session
-export async function createSession(userId: number):  Promise<Result<Session>> {
+export async function createSession(userId: string):  Promise<Result<Session>> {
     try{
         const db = await getDb();
         const sessionId = createId();
         const expiresAt = new Date(Date.now() + SESSION_DURATION);
 
-        const [session] = await db.insert(sessions).values({id: sessionId, userId, expiresAt}).returning();
-        return ResultHandler.success(session);
+        const [created_Session] = await db.insert(session).values({ id: sessionId, userId, expiresAt, token: createId() }).returning();
+        return ResultHandler.success(created_Session);
     } catch(error){
         console.error("Error creating session: ", error);
         return ResultHandler.failure("Failed to create session", Errors.INTERNAL_SERVER_ERROR);
@@ -28,35 +28,26 @@ export async function createSession(userId: number):  Promise<Result<Session>> {
 export async function getSession(sessionId: string): Promise<Result<{session: Session; user: SafeUser} | null>> {
     try{
         const db = await getDb();
-        const result = await db.select({
-            session: sessions, 
-            users:{
-                id: users.id,
-                username: users.username,
-                email: users.email,
-                role: users.role,
-                isActive: users.isActive,
-                lastLoginAt: users.lastLoginAt,
-                createdAt:users.createdAt,
-                updatedAt: users.updatedAt,
-            },
-        }).from(sessions).innerJoin(users, eq(sessions.userId, users.id)).where(
+        const { passwordHash: _omit, ...safeColumns} = getColumns(user);
+        const result = await db.select({session: session, user: safeColumns})
+        .from(session).innerJoin(user, eq(session.userId, user.id)).where( 
             and(
-                eq(sessions.id,sessionId),
-                gt(sessions.expiresAt, new Date()),
-                eq(users.isActive, true)
-            )
-        ).limit(1);
+                eq(session.id,sessionId),
+                gt(session.expiresAt, new Date()),
+                eq(user.isActive, true)
+            )).limit(1);
+
+
         if(result.length === 0){
             return ResultHandler.success(null);
         }
 
-        const {session, user} = result[0];
+        const {session: foundSession, user: foundUser} = result[0];
 
         //update last lojg time
-        await db.update(users).set({lastLoginAt: new Date()}).where(eq(users.id, user.id));
+        await db.update(user).set({lastLoginAt: new Date()}).where(eq(user.id, user.id));
 
-        return ResultHandler.success({session, user});
+        return ResultHandler.success({session: foundSession, user: foundUser});
     }catch(error){
         console.error("Error getting session:", error); 
         return ResultHandler.failure(
@@ -69,7 +60,7 @@ export async function getSession(sessionId: string): Promise<Result<{session: Se
 export async function deleteSession(sessionId: string): Promise<Result<void>>{
     try{
         const db = await getDb();
-        await db.delete(sessions).where(eq(sessions.id, sessionId));
+        await db.delete(session).where(eq(session.id, sessionId));
         return ResultHandler.success(undefined);
     }catch(error){
         console.error("Error edeletion sesison:", error);
@@ -81,11 +72,11 @@ export async function cleanupExpieredSessions(): Promise<Result<number>> {
     try{
         const db = await getDb();
 
-        const deleate = await db.delete(sessions).where(lt(sessions.expiresAt, new Date())).returning({id: sessions.id});
+        const deleate = await db.delete(session).where(lt(session.expiresAt, new Date())).returning({id: session.id});
         return ResultHandler.success(deleate.length);
     }catch(error){
-        console.error("Error cleaning up sessions:", error);
-        return ResultHandler.failure("Failed to cleanup sessions", Errors.INTERNAL_SERVER_ERROR);
+        console.error("Error cleaning up session:", error);
+        return ResultHandler.failure("Failed to cleanup session", Errors.INTERNAL_SERVER_ERROR);
     }
     
 }

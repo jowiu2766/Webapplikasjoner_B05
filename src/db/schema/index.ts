@@ -5,14 +5,6 @@ export * from "./case-schema";
 export * from "./message-schema";
 //export * from "./auth-schema";
 
-export {
-  user,
-  session,
-  account,
-  verification,
-} from "./auth-schema";
+export * from "./auth-schema";
 
-export type {
-  User,
-  CreateUser,
-} from "./auth-schema";
+export type * from "./auth-schema";

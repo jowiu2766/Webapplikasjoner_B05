@@ -13,7 +13,7 @@ export interface AuthRepository{
     findUserByEmail(email: string): Promise<Result<User | null>>;
     findUserById(id: string): Promise<Result<User | null>>;
     createUser(data: CreateUser): Promise<Result<SafeUser>>;
-    updateLastLogin(userId: number): Promise<Result<void>>;
+    updateLastLogin(userId: string): Promise<Result<void>>;
 }
 
 export function createAuthRepository(db: DB): AuthRepository{
@@ -68,13 +68,13 @@ export function createAuthRepository(db: DB): AuthRepository{
                 return ResultHandler.failure("Failed to create user", Errors.INTERNAL_SERVER_ERROR);
             }
         },
-        async updateLastLogin(userId: number){
+        async updateLastLogin(userId: string){
             try{
                 await db.update(user).set({lastLoginAt: new Date()}).where(eq(user.id, userId));
                 return ResultHandler.success(undefined);
             }catch(error){
                 console.error("Error updating last login:", error);
-                return ResultHandler.failure("Failed to pdate last login", Errors.FORBIDDEN);
+                return ResultHandler.failure("Failed to update last login", Errors.FORBIDDEN);
             }
         },
 

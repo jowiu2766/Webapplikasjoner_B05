@@ -22,7 +22,7 @@ export const user = sqliteTable("user", {
     .notNull(),
   lastLoginAt: integer("last_login_at", {mode: "timestamp_ms"}),
   isActive: integer("is_active", {mode: "boolean"}).notNull().default(true),
-  address: text("address"),
+  address: text("address").notNull(),
 });
 
 export const session = sqliteTable(
@@ -107,4 +107,4 @@ export type User = typeof user.$inferSelect;
 export type CreateUser = typeof user.$inferInsert;
 export type Session = typeof session.$inferSelect;
 export type UserRole = "Unauthenticated" | "Tenant" | "Landlord" | "Admin";
-export type SafeUser = Omit<typeof user.$inferInsert,"passwordHash">
+export type SafeUser = Omit<User,"passwordHash">
