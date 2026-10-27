@@ -7,36 +7,18 @@ import { caseCategories, casePriorities, caseStatuses } from "@/lib/enums";
 export const cases = sqliteTable(
   "cases",
   {
-    id: text("id")
-      .primaryKey()
-      .$default(() => createId()),
+    id: text("id").primaryKey().$default(() => createId()),
     title: text("title").notNull(),
     description: text("description").notNull(),
     category: text("category", { enum: caseCategories }).notNull(),
     priority: text("priority", { enum: casePriorities }).notNull(),
     deadline: integer("deadline", { mode: "timestamp" }).notNull(),
     status: text("status", { enum: caseStatuses }).notNull().default("open"),
-    tenantId: text("tenant_id")
-  .notNull()
-  .references(() => user.id),
-
-landlordId: text("landlord_id")
-  .notNull()
-  .references(() => user.id),
-    createdAt: integer("created_at", { mode: "timestamp" })
-      .notNull()
-      .$default(() => new Date()),
-
-      deadline: integer("deadline", {
-  mode: "timestamp",
-}),
-
-updatedAt: integer("updated_at", {
-  mode: "timestamp",
-})
-  .notNull()
-  .$default(() => new Date()),
-  },
+    tenantId: text("tenant_id").notNull().references(() => user.id),
+    landlordId: text("landlord_id").notNull().references(() => user.id),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull().$default(() => new Date()),
+    updatedAt: integer("updated_at", {mode: "timestamp"}).notNull().$default(() => new Date()).$onUpdate(() => new Date()),
+},
   (table) => [
     index("idx_cases_tenant_id").on(table.tenantId),
     index("idx_cases_landlord_id").on(table.landlordId),
