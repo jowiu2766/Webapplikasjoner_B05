@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { cases } from "@/db/schema";
 import type { Case, CreateCase } from "@/db/schema";
-import { Result } from "../types/restult";
+import { Result } from "@/types/result";
 
 export interface CaseRepository {
   create(data: CreateCase): Promise<Result<Case>>;
