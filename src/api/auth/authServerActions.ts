@@ -3,19 +3,19 @@
 import { authService, AuthService } from "./authService";
 import { Errors } from "@/types/errors";
 import { SafeUser, Session } from "@/db/schema";
-import { email } from "zod";
 import { setSessionCookie, clearSessionCookie } from "@/lib/auth/session";
 import { requestInfo } from "rwsdk/worker";
 import { ServerResult } from "@/types/result";
-import { ca, fa, tr } from "zod/v4/locales";
-import { error } from "node:console";
+import { UserDTO } from "@/lib/schema/auth-dtos";
 
 export async function register(prevState: any, formData: FormData): Promise<ServerResult<{user: SafeUser, session: Session}>>{
     try{
         const credentials = {
-            username: formData.get("username") as string,
+            name: formData.get("name") as string,
             email: formData.get("email") as string,
-            password: formData.get("password") as string
+            password: formData.get("password") as string,
+            address: formData.get("address") as string
+
         };
 
         const result = await authService.register(credentials);
@@ -26,7 +26,7 @@ export async function register(prevState: any, formData: FormData): Promise<Serv
                 success: false,
                 error: result.error.message,
                 code: result.error.code,
-                state: {username: credentials.username, email: credentials.email},
+                state: {name: credentials.name, email: credentials.email},
             };
         }
 
@@ -53,10 +53,10 @@ export async function register(prevState: any, formData: FormData): Promise<Serv
     }
 }
 
-export async function login(prevState: any, formData: FormData): Promise<ServerResult<{user: SafeUser, session: Session}>>{
+export async function login(prevState: any, formData: FormData):Promise<ServerResult<{ user: UserDTO; session: Session }>> {
     try{
         const credentials = {
-            username: formData.get("username") as string,
+            name: formData.get("name") as string,
             password: formData.get("password") as string,
         };
         const result = await authService.login(credentials);
@@ -65,7 +65,7 @@ export async function login(prevState: any, formData: FormData): Promise<ServerR
                 success: false,
                 error: result.error.message,
                 code: result.error.code,
-                state: {username: credentials.username}
+                state: {name: credentials.name}
             };
         }
         //Mutate the header so the cookie is set

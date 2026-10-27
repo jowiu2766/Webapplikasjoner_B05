@@ -5,7 +5,7 @@ export interface AuthContext{
     session: Session | null;
 }
 export interface LoginCredentials{
-    username: string; 
+    name: string; 
     password: string;
 
 }
@@ -13,5 +13,5 @@ export interface RegisterCredentials{
     name: string; 
     email: string; 
     password: string;
-    adress: string
+    address: string
 }
