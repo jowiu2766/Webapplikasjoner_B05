@@ -41,10 +41,9 @@ export const relations = defineRelations(schema, (r) => ({
       optional: false,
     }),
     messages: r.many.messages({
-  from: r.cases.id,
-  to: r.messages.caseId,
+      from: r.cases.id,
+      to: r.messages.caseId,
 }),
-    messages: r.many.messages({ from: r.cases.id, to: r.messages.caseId }),
   },
   messages: {
     case: r.one.cases({
@@ -52,25 +51,13 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.cases.id,
       optional: false,
     }),
-    sender: r.one.users({
+    sender: r.one.user({
       from: r.messages.senderId,
-      to: r.users.id,
+      to: r.user.id,
       optional: false,
     }),
   },
-  messages: {
-  case: r.one.cases({
-    from: r.messages.caseId,
-    to: r.cases.id,
-    optional: false,
-  }),
-
-  sender: r.one.user({
-    from: r.messages.senderId,
-    to: r.user.id,
-    optional: false,
-  }),
-},
+  
 }));
 
 export type Relations = typeof relations;

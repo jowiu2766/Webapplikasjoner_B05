@@ -6,60 +6,62 @@
 // Skal bare brukes i utviklingsmiljøet.
 import { defineScript } from "rwsdk/worker";
 import { drizzle } from "drizzle-orm/d1";
-import { user, cases,messages,  } from "./schema";
-import { users, tasks, cases, messages } from "./schema";
+import { relations } from "./relations";
+import { user, cases, messages } from "./schema";
+import { hashPassword } from "@/lib/auth/password";
 
 export const seedData = async (env: Env) => {
-  const db = drizzle(env.DB);
-
+  const db = drizzle(env.DB, { relations });
   // Seed skal ikke slette ekte brukere eller saker.
-// Vi bruker faste demo-ID-er og unngår duplikater.
-const leietakerId = "demo-leietaker";
-const utleierId = "demo-utleier";
-const now = new Date();
+  // Vi bruker faste demo-ID-er og unngår duplikater.
+  const leietakerId = "demo-leietaker";
+  const utleierId = "demo-utleier";
+  const now = new Date();
+  const dag = 86_400_000;
   // Tøm først, så seed kan kjøres om igjen uten å doble alt.
+
   // barna før foreldrene
   await db.delete(messages);
   await db.delete(cases);
-  await db.delete(tasks);
-  await db.delete(users);
+  await db.delete(user);
 
   // Brukerne må inn før sakene: fremmednøkkelen krever at brukeren finnes.
   // Databasen nekter hvis dere tar rekkefølgen feil, og det er en god ting.
+
+  const passwordHash = await hashPassword("Password1234A");
   
-await db.insert(user).values([
-  {
-    id: leietakerId,
-    name: "Kari Nordmann",
-    email: "kari@example.com",
-    emailVerified: false,
-    role: "tenant",
-    createdAt: now,
-    updatedAt: now,
-  },
-  {
-    id: utleierId,
-    name: "Ola Utleier",
-    email: "ola@example.com",
-    emailVerified: false,
-    role: "landlord",
-    createdAt: now,
-    updatedAt: now,
-  },
-]).onConflictDoNothing();
+  await db.insert(user).values([
+    {
+      id: leietakerId,
+      name: "Kari Nordmann",
+      email: "kari@example.com",
+      emailVerified: false,
+      passwordHash,
+      address: "Testveien 1",
+      role: "Tenant",
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: utleierId,
+      name: "Ola Utleier",
+      email: "ola@example.com",
+      emailVerified: false,
+      passwordHash,
+      address: "Testveien 2",
+      role: "Landlord",
+      createdAt: now,
+      updatedAt: now,
+    },
+  ]).onConflictDoNothing();
 
 
   // fire saker med ulik status og prioritet
-  const dag = 86_400_000;
-  const [lekkasje] = await db
-    .insert(cases)
-    .values([
+  
+  const [lekkasje] = await db.insert(cases).values([
     {
       title: "Vannlekkasje under kjøkkenvasken",
-      description:
-        "Det drypper fra røret under vasken. Har satt en bøtte under.",
-      category: "pipes",
-      description: "Det drypper fra røret under vasken. Har satt en bøtte under.",
+      description:"Det drypper fra røret under vasken. Har satt en bøtte under.",
       category: "pipes", 
       priority: "high",
       deadline: new Date(Date.now() + 3 * dag),
@@ -101,20 +103,20 @@ await db.insert(user).values([
       landlordId: utleierId,
       createdAt: new Date(Date.now() - 30 * dag),
     },
-  ]).onConflictDoNothing();
-  ])
-    .returning();
+  ]).returning();
+  if (!lekkasje) throw new Error("Seeding av saker feilet");
+  
 
   await db.insert(messages).values([
     {
       caseId: lekkasje.id,
-      senderId: utleier.id,
+      senderId: utleierId,
       body: "Takk, jeg ringer rørleggeren i morgen tidlig.",
       createdAt: new Date(Date.now() - 1 * dag + 3_600_000),
     },
     {
       caseId: lekkasje.id,
-      senderId: leietaker.id,
+      senderId: leietakerId,
       body: "Flott. Jeg er hjemme etter klokka 15.",
       createdAt: new Date(Date.now() - 1 * dag + 7_200_000),
     },
