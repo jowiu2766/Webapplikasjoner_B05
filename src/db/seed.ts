@@ -6,7 +6,7 @@
 // Skal bare brukes i utviklingsmiljøet.
 import { defineScript } from "rwsdk/worker";
 import { drizzle } from "drizzle-orm/d1";
-import { user, cases } from "./schema";
+import { user, cases,messages,  } from "./schema";
 import { users, tasks, cases, messages } from "./schema";
 
 export const seedData = async (env: Env) => {

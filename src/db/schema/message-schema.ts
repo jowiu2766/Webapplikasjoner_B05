@@ -8,7 +8,7 @@ import {
 
 // En melding tilhører én sak og har én avsender.
 import { cases } from "./case-schema";
-import { users } from "./user-schema";
+import { user } from "./auth-schema";
 import { createId } from "@/lib/id";
 
 export const messages = sqliteTable(

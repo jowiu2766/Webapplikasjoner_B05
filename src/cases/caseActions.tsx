@@ -3,6 +3,7 @@
 import { createCaseSchema } from "./caseSchema";
 import { caseService } from "./caseService";
 import type { Case } from "@/db/schema";
+import { Result } from "@/types/result";
 
 // Må legge til deadline og filer her
 export async function createCaseAction(

@@ -3,9 +3,7 @@
 // tabell to ganger (én gang direkte, én gang via denne re-eksporten).
 export * from "./case-schema";
 export * from "./message-schema";
-export * from "./task-schema";
 //export * from "./auth-schema";
-export * from "./user-schema";
 
 export {
   user,

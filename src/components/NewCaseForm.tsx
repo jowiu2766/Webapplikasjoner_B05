@@ -1,6 +1,6 @@
 "use client";
 
-import { createCaseAction } from "@/app/features/caseActions";
+import { createCaseAction } from "@/cases/caseActions";
 import { useState, useTransition } from "react";
 import {
   caseCategories,

@@ -1,6 +1,6 @@
 import {getDb} from "@/db";
 import { createId } from "../id";
-import { SafeUser, Session, sessions, users } from "@/db/schema";
+import { SafeUser, Session, sessions, user } from "@/db/schema";
 import { ResultHandler } from "../utils/result";
 import {Result} from "@/types/result";
 import {Errors} from "@/types/errors";
@@ -30,7 +30,7 @@ export async function getSession(sessionId: string): Promise<Result<{session: Se
         const db = await getDb();
         const result = await db.select({
             session: sessions, 
-            user:{
+            users:{
                 id: users.id,
                 username: users.username,
                 email: users.email,
