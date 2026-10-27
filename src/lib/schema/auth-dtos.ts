@@ -8,9 +8,10 @@ export const LoginDTOSchema = z.object({
 
 //registe DTO schemas
 export const RegisterDTOSchema = z.object({
-    username: z.string().min(3).max(30),
+    name: z.string().min(3).max(30),
     email: z.email(),
     password: z.string().min(8),
+    address: z.string().min(1)
 });
 
 //user DTO for response(never incluides password hash)

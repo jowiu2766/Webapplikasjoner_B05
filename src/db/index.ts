@@ -1,5 +1,6 @@
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import type { SQLiteAsyncDatabase } from "drizzle-orm/sqlite-core";
+import { defineRelations } from "drizzle-orm";
 import { env } from "cloudflare:workers";
 import * as schema from "./schema";
 import { relations } from "./relations";
@@ -8,7 +9,8 @@ export { schema, relations };
 
 
 
-let dbInstance: DrizzleD1Database<typeof schema> |null = null;
+
+let dbInstance: DB  |null = null;
 
 async function getWorkerEnv(): Promise<D1Database>{
     try{
@@ -23,11 +25,11 @@ async function getWorkerEnv(): Promise<D1Database>{
     }
 }
 //Factory fucntion that accepts a D1 databse instnace
-export function createDatabase(d1Database: D1Database): DrizzleD1Database<typeof schema>{
+export function createDatabase(d1Database: D1Database){
     if (!d1Database){
         throw new Error("D1 Databse is required");
     }
-    return drizzle(d1Database, {schema});
+    return drizzle(d1Database, {relations});
 }
 
 //Setup database with Provided D1 instance
@@ -40,11 +42,11 @@ export function setupDb(d1Database: D1Database){
 }
 
 
-export async function getDb(): Promise<DrizzleD1Database<typeof schema>> {
+export async function getDb(): Promise<DB> {
     if(!dbInstance){
         dbInstance = createDatabase(await getWorkerEnv());
     }
     return dbInstance;
 }
 
-export type DB = DrizzleD1Database<typeof schema>;
+export type DB = ReturnType<typeof createDatabase>;

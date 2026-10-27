@@ -6,7 +6,7 @@ import type { SafeUser, Session } from "@/db/schema";
 import { Result } from "@/types/result";
 import { ResultHandler } from "@/lib/utils/result";
 import { Errors } from "@/types/errors";
-
+import type { UserDTO } from "@/lib/schema/auth-dtos";
 import { createSession, deleteSession } from "@/lib/auth/session";
 import userEvent from "@testing-library/user-event";
 import { LoginDTOSchema, RegisterDTOSchema } from "@/lib/schema/auth-dtos";
@@ -15,7 +15,7 @@ import { hash } from "node:crypto";
 
 export interface AuthService{
     register(credentials: RegisterCredentials,): Promise<Result<{user: SafeUser; session: Session}>>;
-    login(credentials: LoginCredentials,): Promise<Result<{user: SafeUser; session: Session}>>;
+    login(credentials: LoginCredentials): Promise<Result<{ user: UserDTO; session: Session }>>;
     logout(sessionId?: string): Promise<Result<void>>;
     createAdminUser(credentials: RegisterCredentials,): Promise<Result<{user: SafeUser; session: Session}>>;
     currentUser(userId: string): Promise<Result<SafeUser>>;
@@ -56,7 +56,7 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
             if(!validation.success){
                 return ResultHandler.failure(`Validation failed: ${validation.error.message}`, Errors.VALIDATION_ERROR);
             }
-            const {username, email, password} = validation.data;
+            const {name, email, password, address} = validation.data;
 
             //Validate password strenght
             const passwordValidation = validatePasswordStrength(password);
@@ -64,7 +64,7 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
 
             //Check if email or username already exists - crashes due to simeltnaous requests on AQLisite
             const existingUserByEmail = await authRepository.findUserByEmail(email);
-            const existingUserByUsername = await authRepository.findUserByUsername(username);
+            const existingUserByUsername = await authRepository.findUserByUsername(name);
             
             if(!existingUserByEmail.success || !existingUserByUsername.success) 
                 return ResultHandler.failure("Error when checking credientials", Errors.INTERNAL_SERVER_ERROR);
@@ -76,7 +76,8 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
             const passwordHash = await hashPassword(password);
             //create user
             const createUserResult = await authRepository.createUser({
-                name, email, passwordHash, role: "Unauthenticated",
+                id: crypto.randomUUID(),
+                name, email, passwordHash,address, role: "Unauthenticated",
             });
             if(!createUserResult.success)
                 return ResultHandler.failure(createUserResult.error, Errors.INTERNAL_SERVER_ERROR);
@@ -137,14 +138,14 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
         async createAdminUser(credentials){
             try{
                 //Check if admin alreasy exists
-                const adminExist = await authRepository.findUserByUsername(credentials.username);
+                const adminExist = await authRepository.findUserByUsername(credentials.name);
                 if(!adminExist.success) return ResultHandler.failure(adminExist.error, Errors.INTERNAL_SERVER_ERROR);
                 if(adminExist.data) return ResultHandler.failure("Existing user", Errors.CONFLICT);
                 //validate
                 const validation = RegisterDTOSchema.safeParse(credentials);
                 if(!validation.success) return ResultHandler.failure(`Validation vaoided: ${validation.error.message}`, Errors.VALIDATION_ERROR);
 
-                const {name,email, password} = validation.data;
+                const {name,email, password, address} = validation.data;
                 //validate password strenght
                 const passwordValidation = validatePasswordStrength(password);
                 if(!passwordValidation.isValid) return ResultHandler.failure(passwordValidation.errors.join(", "), Errors.VALIDATION_ERROR);
@@ -153,7 +154,9 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
                 const passwordHash = await hashPassword(password);
                 //creatre admin user
                 const createUserResult = await authRepository.createUser({
-                    name, email, passwordHash, role: "Admin",
+                    id: crypto.randomUUID(),
+                    name, email, passwordHash,address,
+                     role: "Admin",
                 });
 
                 if(!createUserResult.success) return ResultHandler.failure(createUserResult.error, Errors.INTERNAL_SERVER_ERROR);
