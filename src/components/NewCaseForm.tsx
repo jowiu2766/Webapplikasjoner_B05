@@ -38,8 +38,8 @@ export function NewCaseForm() {
         deadline.toISOString(),
         //  files,
       );
-      if (!result) {
-        setError(result.error ?? "Feil ved innsending av skjema"); // må forbedre feilmelding her, midlertidig fiks
+      if (!result.success) {
+        setError(result.error.message ?? "Feil ved innsending av skjema"); // må forbedre feilmelding her, midlertidig fiks
         return;
       }
       setTitle("");
