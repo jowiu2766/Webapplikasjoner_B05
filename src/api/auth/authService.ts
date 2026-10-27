@@ -18,12 +18,12 @@ export interface AuthService{
     login(credentials: LoginCredentials,): Promise<Result<{user: SafeUser; session: Session}>>;
     logout(sessionId?: string): Promise<Result<void>>;
     createAdminUser(credentials: RegisterCredentials,): Promise<Result<{user: SafeUser; session: Session}>>;
-    currentUser(userId: number): Promise<Result<SafeUser>>;
+    currentUser(userId: string): Promise<Result<SafeUser>>;
 }
 
 export function createAuthService(authRepository: AuthRepository): AuthService{
     //simple helpder to handle faiulure on session creation, prevent DRY since it is used multiple times
-    const createUserSession = async (userId: number) =>{
+    const createUserSession = async (userId: string) =>{
         const sessionResult =await createSession(userId);
         if(!sessionResult.success){
             throw new Error("Failed to create session");
@@ -76,7 +76,7 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
             const passwordHash = await hashPassword(password);
             //create user
             const createUserResult = await authRepository.createUser({
-                username, email, passwordHash, role: "Unauthenticated",
+                name, email, passwordHash, role: "Unauthenticated",
             });
             if(!createUserResult.success)
                 return ResultHandler.failure(createUserResult.error, Errors.INTERNAL_SERVER_ERROR);
@@ -144,7 +144,7 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
                 const validation = RegisterDTOSchema.safeParse(credentials);
                 if(!validation.success) return ResultHandler.failure(`Validation vaoided: ${validation.error.message}`, Errors.VALIDATION_ERROR);
 
-                const {username,email, password} = validation.data;
+                const {name,email, password} = validation.data;
                 //validate password strenght
                 const passwordValidation = validatePasswordStrength(password);
                 if(!passwordValidation.isValid) return ResultHandler.failure(passwordValidation.errors.join(", "), Errors.VALIDATION_ERROR);
@@ -153,7 +153,7 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
                 const passwordHash = await hashPassword(password);
                 //creatre admin user
                 const createUserResult = await authRepository.createUser({
-                    username, email, passwordHash, role: "Admin",
+                    name, email, passwordHash, role: "Admin",
                 });
 
                 if(!createUserResult.success) return ResultHandler.failure(createUserResult.error, Errors.INTERNAL_SERVER_ERROR);
