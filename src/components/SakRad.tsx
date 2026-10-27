@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Case, User } from "@/db/schema";
-import { categoryLabels, priorityLabels, statusLabels, type UserRole } from "@/lib/enums";
-
+import { categoryLabels, priorityLabels, statusLabels } from "@/lib/enums";
+import type { UserRole } from "@/db/schema";
 // en sak i lista, tabellrad på desktop og kort på mobil
 export function SakRad({
   sak,

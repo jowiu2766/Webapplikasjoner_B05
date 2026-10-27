@@ -11,11 +11,9 @@ import { headers } from "happy-dom/lib/PropertySymbol";
 import { SafeUser } from "./db/schema";
 import { AuthContext } from "./types/authorisation";
 import { setupDb, type DB } from "@/db";
-
-import { NewCase } from "./app/pages/NewCase";
-import { SakerList } from "@/app/pages/saker/List";
 import { SakDetalj } from "@/app/pages/saker/Detail";
-
+import { getDb } from "@/db";
+import { authenticationMiddelware } from "./middelWare/Authentication";
 /**
  * Alt som ligger på `ctx` for én forespørsel.
  *
@@ -39,19 +37,13 @@ export type AppContext = {
 const app = defineApp([
   // Middleware. Kjører for hver forespørsel, i rekkefølgen de står.
   setCommonHeaders(),
+  authenticationMiddelware,
 
   // API-rute. Ligger UTENFOR render(), så svaret er akkurat det handleren
   // returnerer: JSON, uten HTML-skall rundt.
   route("/api/status", () => Response.json({ status: "ok", version: "0.1.0" })),
 
   // Sider. render(Document, [...]) pakker dem i et helt HTML-dokument.
-  render(Document,[
-      layout(AppLayout, [
-        route("/", Home),
-        route("/Screens", TestStateSceeen),
-      ])
-    ])
-  ]);
   render(Document, [
     route("/", Home),
     route("/saker", SakerList),

@@ -11,8 +11,10 @@ import {
 import { EmptyState } from "@/components/EmptyState";
 import { SakRad } from "@/components/SakRad";
 import { NewCase } from "./NewCase";
-
+import { user, type UserRole } from "@/db/schema";
 // sakslista, filteret er et vanlig skjema med method=get
+
+
 export async function SakerList({ request }: RequestInfo) {
   const url = new URL(request.url);
   const filter = parseSakFilter(url.searchParams);
@@ -20,9 +22,6 @@ export async function SakerList({ request }: RequestInfo) {
     filter.status !== undefined || filter.prioritet !== undefined;
 
   // midlertidig til innlogging er på plass, velg bruker med ?rolle=landlord
-  const rolle =
-    url.searchParams.get("rolle") === "landlord" ? "landlord" : "tenant";
-  const bruker = await db.query.users.findFirst({ where: { role: rolle } });
   const bruker = await midlertidigBruker(request);
   if (!bruker) {
     return (
@@ -34,9 +33,9 @@ export async function SakerList({ request }: RequestInfo) {
     );
   }
 
-  const erUtleier = bruker.role === "landlord";
-  const rolle = bruker.role;
+  const erUtleier = bruker.role === "Landlord";
   const saker = await listSaker(bruker, filter);
+  const rolle = bruker.role;
 
   const selectClass = "mt-1 rounded-md border border-slate-300 px-3 py-2";
 
@@ -52,8 +51,6 @@ export async function SakerList({ request }: RequestInfo) {
         className="mt-6 flex flex-wrap items-end gap-3 text-sm"
       >
         {/* rollen blir med når skjemaet sendes */}
-        <input type="hidden" name="rolle" value={rolle} />
-
         <label className="flex flex-col">
           Status
           <select
