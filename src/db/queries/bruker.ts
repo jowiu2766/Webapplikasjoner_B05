@@ -1,7 +1,8 @@
-import { db } from "@/db";
+import { getDb } from "@/db";
 
 export async function midlertidigBruker(request: Request) {
+  const db = await getDb();
   const rolle =
-    new URL(request.url).searchParams.get("rolle") === "landlord" ? "landlord" : "tenant";
-  return db.query.users.findFirst({ where: { role: rolle } });
+    new URL(request.url).searchParams.get("rolle") === "Landlord" ? "Landlord" : "Tenant";
+  return db.query.user.findFirst({ where: { role: rolle } });
 }
