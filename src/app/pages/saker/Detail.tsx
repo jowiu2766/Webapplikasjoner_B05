@@ -38,7 +38,7 @@ export async function SakDetalj({ params, request, response }: RequestInfo<{ id:
     );
   }
 
-  const erUtleier = bruker.role === "landlord";
+  const erUtleier = bruker.role === "Landlord";
   const tilbake = `/saker?rolle=${bruker.role}`;
 
   return (
