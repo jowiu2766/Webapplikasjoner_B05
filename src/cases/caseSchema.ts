@@ -8,6 +8,7 @@ export const createCaseSchema = z.object({
   priority: z.enum(casePriorities),
   description: z.string(),
   deadline: z.coerce.date(),
+  file: z.string(),
 });
 
 export type CreateCaseInput = z.infer<typeof createCaseSchema>;

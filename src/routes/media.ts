@@ -5,8 +5,9 @@ import { dbInstance } from "@/db";
 import { eq } from "drizzle-orm";
 import { route } from "rwsdk/router";
 
+// Post
 export const fileUploadRoute = route(
-  "/api/saker/:id/file",
+  "/api/saker/ny",
   async ({ request, ctx, params }) => {
     if (request.method !== "POST") {
       return new Response("Method Not Allowed", { status: 405 });
@@ -40,3 +41,21 @@ export const fileUploadRoute = route(
     return Response.json({ fileKey: result.key }, { status: 200 });
   },
 );
+
+// Get - mulig denne må endres
+export const mediaRoute = route("/media/*", async ({ params }) => {
+  const key = params.$0; // hele resten av stien, skråstreker inkludert
+  const object = await env.R2.get(key);
+  if (!object) return new Response("Not found", { status: 404 });
+
+  return new Response(object.body, {
+    headers: {
+      "Content-Type":
+        object.httpMetadata?.contentType ?? "application/octet-stream",
+      // 30 dagers cache + immutable: bildet endres aldri (unikt key per upload)
+      "Cache-Control": "public, max-age=2592000, immutable",
+      // httpEtag (ikke etag): allerede sitert slik HTTP-spec krever
+      ETag: object.httpEtag,
+    },
+  });
+});

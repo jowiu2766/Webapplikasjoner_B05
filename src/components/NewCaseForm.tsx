@@ -36,7 +36,7 @@ export function NewCaseForm() {
         priority,
         description,
         deadline.toISOString(),
-        //  files,
+        files,
       );
       if (!result.success) {
         setError(result.error.message ?? "Feil ved innsending av skjema"); // må forbedre feilmelding her, midlertidig fiks
@@ -148,6 +148,7 @@ export function NewCaseForm() {
         }}
         className="text-sm file:cursor-pointer file:rounded-md file:bg-slate-100 file:px-3 file:py-2"
       />
+      {/* File upload with R2 */}
       {/* Submit button */}
       <div>
         <button

@@ -10,22 +10,23 @@ export interface CaseRepository {
 }
 const db = await getDb();
 
-export function createCaseRepository(getDatabase: () => Promise<DB> = getDb): CaseRepository {  return {
+export function createCaseRepository(
+  getDatabase: () => Promise<DB> = getDb,
+): CaseRepository {
+  return {
     async create(data) {
-      try{
+      try {
         const db = await getDatabase();
         const [newCase] = await db.insert(cases).values(data).returning();
         return ResultHandler.success(newCase);
-      }
-      catch(error){
+      } catch (error) {
         console.error("Error creating case:", error);
-        return ResultHandler.failure("Failed toc rease case", Errors.INTERNAL_SERVER_ERROR)
-
+        return ResultHandler.failure(
+          "Failed toc rease case",
+          Errors.INTERNAL_SERVER_ERROR,
+        );
       }
-      
- 
-      
-    }
+    },
   };
 }
 

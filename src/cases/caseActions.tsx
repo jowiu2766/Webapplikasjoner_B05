@@ -14,6 +14,7 @@ export async function createCaseAction(
   priority: string,
   description: string,
   deadline: string,
+  file: string,
 ): Promise<Result<Case>> {
   const validation = createCaseSchema.safeParse({
     title,
@@ -21,14 +22,15 @@ export async function createCaseAction(
     priority,
     description,
     deadline,
+    file,
   });
 
   // Må legge til bedre validering
   if (!validation.success) {
     return ResultHandler.failure(
       "Valideringsfeil - sjekk kategori og prioritet (de som for øyeblikket må fylles for å sende inn skjema)",
-      Errors.VALIDATION_ERROR
-    )
+      Errors.VALIDATION_ERROR,
+    );
   }
 
   return caseService.create(validation.data);
