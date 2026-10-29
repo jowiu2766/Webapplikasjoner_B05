@@ -14,6 +14,7 @@ import { setupDb, type DB } from "@/db";
 import { SakDetalj } from "@/app/pages/saker/Detail";
 import { getDb } from "@/db";
 import { authenticationMiddelware } from "./middelWare/Authentication";
+import { fileUploadRoute, mediaRoute } from "./routes/media";
 /**
  * Alt som ligger på `ctx` for én forespørsel.
  *
@@ -27,12 +28,13 @@ import { authenticationMiddelware } from "./middelWare/Authentication";
 //  ctx.user = session?.user ?? null;
 //  ctx.role = getRole(ctx.user);}
 
-export interface Env{ DB: D1Database; }
+export interface Env {
+  DB: D1Database;
+}
 
 export type AppContext = {
   db: DB;
 } & AuthContext;
-
 
 const app = defineApp([
   // Middleware. Kjører for hver forespørsel, i rekkefølgen de står.
@@ -42,6 +44,8 @@ const app = defineApp([
   // API-rute. Ligger UTENFOR render(), så svaret er akkurat det handleren
   // returnerer: JSON, uten HTML-skall rundt.
   route("/api/status", () => Response.json({ status: "ok", version: "0.1.0" })),
+  fileUploadRoute,
+  mediaRoute,
 
   // Sider. render(Document, [...]) pakker dem i et helt HTML-dokument.
   render(Document, [

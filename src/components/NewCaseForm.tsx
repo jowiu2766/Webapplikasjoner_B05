@@ -8,6 +8,7 @@ import {
   casePriorities,
   CasePriority,
 } from "@/lib/enums";
+import { FileUpload } from "./FileUpload";
 
 // Setter deadline automatisk 7 dager fra sak sendes inn hvis deadline ikke blir satt av bruker
 function defaultDeadline() {
@@ -22,7 +23,7 @@ export function NewCaseForm() {
   const [priority, setPriority] = useState<CasePriority | "choose">("choose");
   const [description, setDescription] = useState("");
   const [deadline, setDeadLine] = useState(defaultDeadline());
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -47,7 +48,7 @@ export function NewCaseForm() {
       setPriority("choose");
       setDescription("");
       setDeadLine(defaultDeadline());
-      setFiles([]);
+      setFiles("");
     });
   }
 
@@ -135,6 +136,7 @@ export function NewCaseForm() {
       />
       {/* Files - mulig å laste opp flere filer samtidig, men man må markere dem samtidig når de skal lastes opp. 
       Hvis ikke erstatter de filene som er lagt til allerede */}
+      {/*
       <label htmlFor="files" className="flex font-medium text-slate-500">
         Filer
       </label>
@@ -148,7 +150,9 @@ export function NewCaseForm() {
         }}
         className="text-sm file:cursor-pointer file:rounded-md file:bg-slate-100 file:px-3 file:py-2"
       />
+      */}
       {/* File upload with R2 */}
+      <FileUpload />
       {/* Submit button */}
       <div>
         <button

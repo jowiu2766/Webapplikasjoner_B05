@@ -9,12 +9,18 @@ import { EmptyState } from "@/components/EmptyState";
 import { MeldingForm } from "@/components/MeldingForm";
 import { StatusVelger } from "@/components/StatusVelger";
 
-export async function SakDetalj({ params, request, response }: RequestInfo<{ id: string }>) {
+export async function SakDetalj({
+  params,
+  request,
+  response,
+}: RequestInfo<{ id: string }>) {
   const bruker = await midlertidigBruker(request);
   if (!bruker) {
     return (
       <Side>
-        <EmptyState title="Fant ingen bruker">Kjør npm run seed først.</EmptyState>
+        <EmptyState title="Fant ingen bruker">
+          Kjør npm run seed først.
+        </EmptyState>
       </Side>
     );
   }
@@ -24,7 +30,9 @@ export async function SakDetalj({ params, request, response }: RequestInfo<{ id:
     response.status = 404;
     return (
       <Side>
-        <EmptyState title="Fant ikke saken">Den finnes ikke, eller er slettet.</EmptyState>
+        <EmptyState title="Fant ikke saken">
+          Den finnes ikke, eller er slettet.
+        </EmptyState>
       </Side>
     );
   }
@@ -33,7 +41,9 @@ export async function SakDetalj({ params, request, response }: RequestInfo<{ id:
     response.status = 403;
     return (
       <Side>
-        <EmptyState title="Ingen tilgang">Du er ikke part i denne saken.</EmptyState>
+        <EmptyState title="Ingen tilgang">
+          Du er ikke part i denne saken.
+        </EmptyState>
       </Side>
     );
   }
@@ -66,10 +76,26 @@ export async function SakDetalj({ params, request, response }: RequestInfo<{ id:
         <dd>{sak.createdAt.toLocaleDateString("no-NO")}</dd>
       </dl>
 
+      <div>
+        {sak.fileKey && (
+          <img
+            src={`/media/${sak.fileKey}`}
+            alt="Vedlegg til sak"
+            className="mt-2 max-h-96 rounded-lg"
+            loading="lazy"
+          />
+        )}
+      </div>
+
       {erUtleier ? (
-        <StatusVelger sakId={sak.id} valg={lovligeOverganger(sak.status, bruker.role)} />
+        <StatusVelger
+          sakId={sak.id}
+          valg={lovligeOverganger(sak.status, bruker.role)}
+        />
       ) : (
-        kanAvbryteSak(sak.status, bruker.role) && <AvbrytSakKnapp sakId={sak.id} />
+        kanAvbryteSak(sak.status, bruker.role) && (
+          <AvbrytSakKnapp sakId={sak.id} />
+        )
       )}
 
       <h2 className="mt-10 text-xl font-semibold">Meldinger</h2>
@@ -84,12 +110,16 @@ export async function SakDetalj({ params, request, response }: RequestInfo<{ id:
               <li
                 key={melding.id}
                 className={`max-w-prose rounded-lg border p-3 ${
-                  egen ? "ml-auto border-slate-900 bg-slate-50" : "border-slate-200"
+                  egen
+                    ? "ml-auto border-slate-900 bg-slate-50"
+                    : "border-slate-200"
                 }`}
               >
                 <p className="text-xs text-slate-500">
                   {egen ? "Deg" : melding.sender.name},{" "}
-                  {melding.createdAt.toLocaleString("no-NO", { timeZone: "Europe/Oslo" })}
+                  {melding.createdAt.toLocaleString("no-NO", {
+                    timeZone: "Europe/Oslo",
+                  })}
                 </p>
                 <p className="mt-1 whitespace-pre-line">{melding.body}</p>
               </li>
@@ -108,5 +138,7 @@ function Side({ children }: { children: ReactNode }) {
 }
 
 function Merke({ children }: { children: ReactNode }) {
-  return <span className="rounded-full bg-slate-100 px-3 py-1">{children}</span>;
+  return (
+    <span className="rounded-full bg-slate-100 px-3 py-1">{children}</span>
+  );
 }

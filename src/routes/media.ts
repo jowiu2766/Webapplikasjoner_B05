@@ -1,13 +1,14 @@
 import { cases } from "@/db/schema";
 import { storeUpload } from "@/lib/upload";
 import { env } from "cloudflare:workers";
-import { dbInstance } from "@/db";
+import { getDb } from "@/db";
 import { eq } from "drizzle-orm";
 import { route } from "rwsdk/router";
 
+const db = await getDb();
 // Post
 export const fileUploadRoute = route(
-  "/api/saker/ny",
+  "/api/saker/:caseId/fil",
   async ({ request, ctx, params }) => {
     if (request.method !== "POST") {
       return new Response("Method Not Allowed", { status: 405 });
@@ -33,7 +34,7 @@ export const fileUploadRoute = route(
     }
 
     // Lagre nøkkelen i databasen: selve bildet bor i R2
-    await dbInstance
+    await db
       .update(cases)
       .set({ fileKey: result.key })
       .where(eq(cases.id, params.caseId));

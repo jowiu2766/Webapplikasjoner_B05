@@ -1,4 +1,5 @@
 "use client";
+import { cases } from "@/db/schema";
 import { useState, useTransition } from "react";
 
 // Tar utgangspunkt i at man kun kan laste opp filer ved innsending av skjema
@@ -20,7 +21,7 @@ export function FileUpload() {
     const data = new FormData(e.currentTarget);
 
     startTransition(async () => {
-      const res = await fetch(`/api/saker/ny`, {
+      const res = await fetch(`/api/saker/${cases.id}/fil`, {
         method: "POST",
         body: data, // fetch setter Content-Type automatisk
       });
@@ -43,7 +44,7 @@ export function FileUpload() {
       )}
       <input
         type="file"
-        name="avatar"
+        name="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
         onChange={handleFileChange}
       />
