@@ -1,6 +1,9 @@
 "use client";
 import { cases } from "@/db/schema";
 import { useState, useTransition } from "react";
+import z from "zod";
+
+const uploadErrorSchema = z.object({ error: z.string() });
 
 // Tar utgangspunkt i at man kun kan laste opp filer ved innsending av skjema
 export function FileUpload() {
@@ -27,8 +30,10 @@ export function FileUpload() {
       });
 
       if (!res.ok) {
-        const { error: errMsg } = await res.json();
-        setError(errMsg ?? "Upload failed");
+        const parsed = uploadErrorSchema.safeParse(
+          await res.json().catch(() => null),
+        );
+        setError(parsed.success ? parsed.data.error : "Upload failed");
       }
     });
   }
