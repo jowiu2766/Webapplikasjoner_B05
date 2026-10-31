@@ -123,6 +123,12 @@ export function RegisterForm() {
             />
           </div>
           <div>
+            <label htmlFor="adress" className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+            <input id="address" name="address" type="text" required autoComplete="street-address" 
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Gate adresse"/>
+          </div>
+
+          <div>
             <label role="radiogroup" className="block text-sm font-medium text-gray-700 mb-1">
               Role
             </label>
