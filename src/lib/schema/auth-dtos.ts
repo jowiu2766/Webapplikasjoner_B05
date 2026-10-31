@@ -2,7 +2,7 @@ import {z} from "zod";
 
 //login DTO schemas
 export const LoginDTOSchema = z.object({
-    username: z.string().min(3).max(8),
+    username: z.string().min(3).max(30),
     password: z.string().min(8),
 });
 

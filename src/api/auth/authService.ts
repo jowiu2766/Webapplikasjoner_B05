@@ -95,7 +95,10 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
         async login(credentials){
             try{
                 //validate input
-                const validation = LoginDTOSchema.safeParse(credentials);
+                const validation = LoginDTOSchema.safeParse({
+                    username: credentials.name,
+                    password: credentials.password
+                });
                 if(!validation.success) 
                     return ResultHandler.failure("Illegal username or password", Errors.UNAUTHORIZED);
                 

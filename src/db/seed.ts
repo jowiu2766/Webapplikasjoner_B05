@@ -29,35 +29,31 @@ export const seedData = async (env: Env) => {
   // Databasen nekter hvis dere tar rekkefølgen feil, og det er en god ting.
 
   const passwordHash = await hashPassword("Password1234A");
-  
-  await db.insert(user).values([
+  const [kariHash, olaHash] = await Promise.all([
+    hashPassword("Kari1234"),
+    hashPassword("Ola12345"),
+  ]);
+
+  // fire saker med ulik status og prioritet
+ await db.insert(user).values([
     {
       id: leietakerId,
-      name: "Kari Nordmann",
-      email: "kari@example.com",
-      emailVerified: false,
-      passwordHash,
-      address: "Testveien 1",
+      name: "kari_leietaker",
+      email: "kari@fiksa.no",
+      passwordHash: kariHash,
       role: "Tenant",
-      createdAt: now,
-      updatedAt: now,
+      address: "Testveien 1",
     },
     {
       id: utleierId,
-      name: "Ola Utleier",
-      email: "ola@example.com",
-      emailVerified: false,
-      passwordHash,
-      address: "Testveien 2",
+      name: "ola_utleier",
+      email: "ola@fiksa.no",
+      passwordHash: olaHash,
       role: "Landlord",
-      createdAt: now,
-      updatedAt: now,
+      address: "Testveien 2",
     },
-  ]).onConflictDoNothing();
+  ]);
 
-
-  // fire saker med ulik status og prioritet
-  
   const [lekkasje] = await db.insert(cases).values([
     {
       title: "Vannlekkasje under kjøkkenvasken",

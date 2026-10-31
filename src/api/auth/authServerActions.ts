@@ -21,7 +21,7 @@ export async function register(prevState: any, formData: FormData): Promise<Serv
 
         const result = await authService.register(credentials);
         //Test to check if the regustriaiton works by writing to log
-        //console.log("Registration result:", result);
+        console.log("Registration result:", result);
 
         if(!result.success) {
             return{
@@ -117,7 +117,7 @@ export async function logout(): Promise<ServerResult<null>> {
         console.error("Logout action error:", error);
         return{
             success: false,
-            error: "LOutout failed",
+            error: "Logout failed",
             code: Errors.INTERNAL_SERVER_ERROR,
         }
     }
