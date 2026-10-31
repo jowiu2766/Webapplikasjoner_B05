@@ -14,7 +14,14 @@ import { setupDb, type DB } from "@/db";
 import { SakDetalj } from "@/app/pages/saker/Detail";
 import { getDb } from "@/db";
 import { authenticationMiddelware } from "./middelWare/Authentication";
+import {
+  reqAuthorization,
+  redirectIfAuthenticated,
+} from "./middelWare/Authorization";
 import { fileUploadRoute, mediaRoute } from "./routes/media";
+import LoginPage from "@/components/auth/pages/LoginPage";
+import RegisterPage from "@/components/auth/pages/RegisterPage";
+
 /**
  * Alt som ligger på `ctx` for én forespørsel.
  *
@@ -49,11 +56,20 @@ const app = defineApp([
 
   // Sider. render(Document, [...]) pakker dem i et helt HTML-dokument.
   render(Document, [
-    route("/", Home),
-    route("/saker", SakerList),
-    route("/saker/ny", NewCase),
-    // etter /saker/ny, ellers tolkes «ny» som en id
-    route("/saker/:id", SakDetalj),
+    layout(AppLayout, [
+      route("/", Home),
+
+      //Login & registering
+      route("/auth/login", [redirectIfAuthenticated, LoginPage ]),
+      route("/auth/register",[redirectIfAuthenticated, RegisterPage ]),
+
+
+      //Krever innloging, uten innloding sened dil til /auth/login
+      route("/saker",  [reqAuthorization(), SakerList]),
+      route("/saker/ny",  [reqAuthorization(), NewCase]),
+      // etter /saker/ny, ellers tolkes «ny» som en id
+      route("/saker/:id",  [reqAuthorization(), SakDetalj]),
+      ]),
   ]),
 ]);
 

@@ -1,6 +1,6 @@
 "use server";
 
-import { authService, AuthService } from "./authService";
+import { authService } from "./authService";
 import { Errors } from "@/types/errors";
 import { SafeUser, Session } from "@/db/schema";
 import { setSessionCookie, clearSessionCookie } from "@/lib/auth/session";
@@ -10,8 +10,9 @@ import { UserDTO } from "@/lib/schema/auth-dtos";
 
 export async function register(prevState: any, formData: FormData): Promise<ServerResult<{user: SafeUser, session: Session}>>{
     try{
+        //Schema bruker feltvavnet "username" mens service kalled det name
         const credentials = {
-            name: formData.get("name") as string,
+            name: formData.get("username") as string,
             email: formData.get("email") as string,
             password: formData.get("password") as string,
             address: formData.get("address") as string
@@ -19,7 +20,8 @@ export async function register(prevState: any, formData: FormData): Promise<Serv
         };
 
         const result = await authService.register(credentials);
-        console.log("Registration result:", result);
+        //Test to check if the regustriaiton works by writing to log
+        //console.log("Registration result:", result);
 
         if(!result.success) {
             return{
@@ -31,10 +33,8 @@ export async function register(prevState: any, formData: FormData): Promise<Serv
         }
 
         //Muates the header so the cookie is set. could be moved to a util
-        const cookie = setSessionCookie(result.data.session.id);
-        requestInfo.response.headers ={
-            ...requestInfo.response.headers, "Set-Cookie": cookie,
-        };
+        requestInfo.response.headers.append("Set-Cookie", setSessionCookie(result.data.session.id))
+     
         return{
             success: true,
             data: {
@@ -56,7 +56,7 @@ export async function register(prevState: any, formData: FormData): Promise<Serv
 export async function login(prevState: any, formData: FormData):Promise<ServerResult<{ user: UserDTO; session: Session }>> {
     try{
         const credentials = {
-            name: formData.get("name") as string,
+            name: formData.get("username") as string,
             password: formData.get("password") as string,
         };
         const result = await authService.login(credentials);
@@ -68,11 +68,8 @@ export async function login(prevState: any, formData: FormData):Promise<ServerRe
                 state: {name: credentials.name}
             };
         }
-        //Mutate the header so the cookie is set
-        const cookie = setSessionCookie(result.data.session.id);
-        requestInfo.response.headers ={
-            ...requestInfo.response.headers, "Set-Cookie": cookie,
-        };
+        requestInfo.response.headers.append("Set-Cookie", setSessionCookie(result.data.session.id))
+
 
         
         return{

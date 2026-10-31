@@ -8,10 +8,8 @@ import { ResultHandler } from "@/lib/utils/result";
 import { Errors } from "@/types/errors";
 import type { UserDTO } from "@/lib/schema/auth-dtos";
 import { createSession, deleteSession } from "@/lib/auth/session";
-import userEvent from "@testing-library/user-event";
 import { LoginDTOSchema, RegisterDTOSchema } from "@/lib/schema/auth-dtos";
 import { mapUserToDTO } from "@/lib/mappers/auth";
-import { hash } from "node:crypto";
 
 export interface AuthService{
     register(credentials: RegisterCredentials,): Promise<Result<{user: SafeUser; session: Session}>>;
@@ -24,7 +22,7 @@ export interface AuthService{
 export function createAuthService(authRepository: AuthRepository): AuthService{
     //simple helpder to handle faiulure on session creation, prevent DRY since it is used multiple times
     const createUserSession = async (userId: string) =>{
-        const sessionResult =await createSession(userId);
+        const sessionResult = await createSession(userId);
         if(!sessionResult.success){
             throw new Error("Failed to create session");
         }
@@ -77,7 +75,7 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
             //create user
             const createUserResult = await authRepository.createUser({
                 id: crypto.randomUUID(),
-                name, email, passwordHash,address, role: "Unauthenticated",
+                name, email, passwordHash, address, role: "Unauthenticated",
             });
             if(!createUserResult.success)
                 return ResultHandler.failure(createUserResult.error, Errors.INTERNAL_SERVER_ERROR);

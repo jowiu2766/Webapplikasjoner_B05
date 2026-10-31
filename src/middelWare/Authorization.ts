@@ -39,6 +39,10 @@ export function reqAuthorization(){
     };
 }
 
+export function redirectIfAuthenticated({ctx,}: {ctx: AppContext}): Response | void {
+    if (ctx.user) return new Response(null, {status: 302, headers: { Location: "/"}})
+}
+
 //function for require role
 export function requireRole(role: UserRole){
     return ({ctx}: {ctx: AppContext}): Response | void =>{

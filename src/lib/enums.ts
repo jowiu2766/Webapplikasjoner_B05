@@ -1,7 +1,8 @@
 // faste verdier for en sak, engelsk i databasen og norsk på skjermen
+import { user, User } from "@/db/schema";
 
-export const userRoles = ["tenant", "landlord"] as const;
-export type UserRole = (typeof userRoles)[number];
+//export const userRoles = ["tenant", "landlord"] as const;
+export type UserRole = (typeof user.role);
 
 export const caseCategories = [
   "electricity",
