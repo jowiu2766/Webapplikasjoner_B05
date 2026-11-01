@@ -1,18 +1,24 @@
 "use client";
-import { cases } from "@/db/schema";
 import { useState, useTransition } from "react";
 import z from "zod";
 
-const uploadErrorSchema = z.object({ error: z.string() });
+export const uploadErrorSchema = z.object({ error: z.string() });
 
 // Tar utgangspunkt i at man kun kan laste opp filer ved innsending av skjema
-export function FileUpload() {
+export function FileUpload({
+  onFileChange,
+}: {
+  onFileChange: (file: File | null) => void;
+}) {
   const [preview, setPreview] = useState<string | null>();
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0] ?? null;
+    if (preview) URL.revokeObjectURL(preview); // releases the old preview
+    setPreview(file ? URL.createObjectURL(file) : null);
+    onFileChange(file);
     if (!file) return;
     // Lokal preview før opplasting til serveren
     setPreview(URL.createObjectURL(file));
@@ -24,7 +30,7 @@ export function FileUpload() {
     const data = new FormData(e.currentTarget);
 
     startTransition(async () => {
-      const res = await fetch(`/api/saker/${cases.id}/fil`, {
+      const res = await fetch(`/api/saker/fil`, {
         method: "POST",
         body: data, // fetch setter Content-Type automatisk
       });
@@ -38,6 +44,25 @@ export function FileUpload() {
     });
   }
 
+  return (
+    <div className="flex flex-col gap-3">
+      {preview && (
+        <img
+          src={preview}
+          alt="Forhåndsvisning"
+          className="h-24 w-24 rounded-md object-cover"
+        />
+      )}
+      <input
+        type="file"
+        name="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        onChange={handleFileChange}
+      />
+    </div>
+  );
+
+  /*
   return (
     <form onSubmit={handleUpload} className="flex flex-col gap-3">
       {preview && (
@@ -62,5 +87,5 @@ export function FileUpload() {
         {isPending ? "Laster opp..." : "Last opp"}
       </button>
     </form>
-  );
+  );*/
 }

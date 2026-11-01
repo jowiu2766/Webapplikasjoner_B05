@@ -5,7 +5,6 @@ import { getDb } from "@/db";
 import { eq } from "drizzle-orm";
 import { route } from "rwsdk/router";
 
-const db = await getDb();
 // Post
 export const fileUploadRoute = route(
   "/api/saker/:caseId/fil",
@@ -13,14 +12,11 @@ export const fileUploadRoute = route(
     if (request.method !== "POST") {
       return new Response("Method Not Allowed", { status: 405 });
     }
-    // Kun innlogget bruker kan oppdatere SIN egen avatar
-    //if (!ctx.session?.isAuthenticated || ctx.session.userId !== params.userId) {
-    //  return new Response("Unauthorized", { status: 401 });
-    //}
     if (!env.R2) {
       return Response.json({ error: "storage-unavailable" }, { status: 503 });
     }
 
+    const db = await getDb();
     const formData = await request.formData();
     const result = await storeUpload(
       env.R2,

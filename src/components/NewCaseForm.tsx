@@ -8,7 +8,7 @@ import {
   casePriorities,
   CasePriority,
 } from "@/lib/enums";
-import { FileUpload } from "./FileUpload";
+import { FileUpload, uploadErrorSchema } from "./FileUpload";
 
 // Setter deadline automatisk 7 dager fra sak sendes inn hvis deadline ikke blir satt av bruker
 function defaultDeadline() {
@@ -23,7 +23,8 @@ export function NewCaseForm() {
   const [priority, setPriority] = useState<CasePriority | "choose">("choose");
   const [description, setDescription] = useState("");
   const [deadline, setDeadLine] = useState(defaultDeadline());
-  const [files, setFiles] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [fileInputKey, setFileInputKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -37,18 +38,38 @@ export function NewCaseForm() {
         priority,
         description,
         deadline.toISOString(),
-        files,
       );
+
       if (!result.success) {
         setError(result.error.message ?? "Feil ved innsending av skjema"); // må forbedre feilmelding her, midlertidig fiks
         return;
+      }
+      if (file) {
+        const data = new FormData();
+        data.append("file", file);
+        const res = await fetch(`/api/saker/${result.data.id}/fil`, {
+          method: "POST",
+          body: data,
+        });
+        if (!res.ok) {
+          const parsed = uploadErrorSchema.safeParse(
+            await res.json().catch(() => null),
+          );
+          setError(
+            parsed.success
+              ? parsed.data.error
+              : "Saken ble opprettet, men fil opplasting feilet",
+          );
+          return;
+        }
       }
       setTitle("");
       setCategory("choose");
       setPriority("choose");
       setDescription("");
       setDeadLine(defaultDeadline());
-      setFiles("");
+      setFile(null);
+      setFileInputKey((k) => k + 1);
     });
   }
 
@@ -152,7 +173,7 @@ export function NewCaseForm() {
       />
       */}
       {/* File upload with R2 */}
-      <FileUpload />
+      <FileUpload key={fileInputKey} onFileChange={setFile} />
       {/* Submit button */}
       <div>
         <button
