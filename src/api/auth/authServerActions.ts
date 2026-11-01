@@ -15,7 +15,8 @@ export async function register(prevState: any, formData: FormData): Promise<Serv
             name: formData.get("username") as string,
             email: formData.get("email") as string,
             password: formData.get("password") as string,
-            address: formData.get("address") as string
+            address: formData.get("address") as string,
+            role: formData.get("role") as string
 
         };
 

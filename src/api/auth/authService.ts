@@ -54,7 +54,7 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
             if(!validation.success){
                 return ResultHandler.failure(`Validation failed: ${validation.error.message}`, Errors.VALIDATION_ERROR);
             }
-            const {name, email, password, address} = validation.data;
+            const {name, email, password, address, role} = validation.data;
 
             //Validate password strenght
             const passwordValidation = validatePasswordStrength(password);
@@ -75,7 +75,7 @@ export function createAuthService(authRepository: AuthRepository): AuthService{
             //create user
             const createUserResult = await authRepository.createUser({
                 id: crypto.randomUUID(),
-                name, email, passwordHash, address, role: "Unauthenticated",
+                name, email, passwordHash, address, role
             });
             if(!createUserResult.success)
                 return ResultHandler.failure(createUserResult.error, Errors.INTERNAL_SERVER_ERROR);

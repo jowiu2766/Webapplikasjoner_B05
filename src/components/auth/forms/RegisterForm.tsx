@@ -140,6 +140,7 @@ export function RegisterForm() {
                   type="radio"
                   value="Tenant"
                   className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
+                  defaultChecked required
                 />
                 <label htmlFor="role-tenant" className="ml-3 block text-sm text-gray-700">
                   Tenant
@@ -152,6 +153,7 @@ export function RegisterForm() {
                   type="radio"
                   value="Landlord"
                   className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
+                  defaultChecked required
                 />
                 <label htmlFor="role-landlord" className="ml-3 block text-sm text-gray-700">
                   Landlord

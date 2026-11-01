@@ -11,7 +11,8 @@ export const RegisterDTOSchema = z.object({
     name: z.string().min(3).max(30),
     email: z.email(),
     password: z.string().min(8),
-    address: z.string().min(1)
+    address: z.string().min(1),
+    role: z.enum(["Tenant", "Landlord"]),
 });
 
 //user DTO for response(never incluides password hash)

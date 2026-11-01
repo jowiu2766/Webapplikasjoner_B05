@@ -14,4 +14,5 @@ export interface RegisterCredentials{
     email: string; 
     password: string;
     address: string
+    role?: string;
 }
