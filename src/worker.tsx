@@ -19,6 +19,7 @@ import {
   redirectIfAuthenticated,
 } from "./middelWare/Authorization";
 import { fileUploadRoute, mediaRoute } from "./routes/media";
+import { adresseHandler } from "@/adresser/adresseHandler";
 import LoginPage from "@/components/auth/pages/LoginPage";
 import RegisterPage from "@/components/auth/pages/RegisterPage";
 
@@ -53,6 +54,7 @@ const app = defineApp([
   route("/api/status", () => Response.json({ status: "ok", version: "0.1.0" })),
   fileUploadRoute,
   mediaRoute,
+  route("/api/adresser", adresseHandler),
 
   // Sider. render(Document, [...]) pakker dem i et helt HTML-dokument.
   render(Document, [

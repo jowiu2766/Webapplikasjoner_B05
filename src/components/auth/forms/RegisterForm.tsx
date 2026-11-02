@@ -3,6 +3,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useState } from "react";
 import { register } from "@/api/auth/authServerActions";
+import { AdresseSok } from "@/components/AdresseSok";
 
 function SubmitButton(){
     const {pending} = useFormStatus();
@@ -122,11 +123,7 @@ export function RegisterForm() {
               placeholder="din@epost.no"
             />
           </div>
-          <div>
-            <label htmlFor="adress" className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-            <input id="address" name="address" type="text" required autoComplete="street-address" 
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Gate adresse"/>
-          </div>
+          <AdresseSok />
 
           <div>
             <label role="radiogroup" className="block text-sm font-medium text-gray-700 mb-1">
