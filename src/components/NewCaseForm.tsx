@@ -177,6 +177,7 @@ export function NewCaseForm() {
       <FileUpload key={fileInputKey} onFileChange={setFile} />
       {/* Submit button */}
       <div>
+        {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           type="submit"
           disabled={isPending}
