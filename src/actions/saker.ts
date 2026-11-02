@@ -7,7 +7,6 @@ import { hentSak, leggTilMelding, settStatus } from "@/db/queries/saker";
 import { caseStatuses } from "@/lib/enums";
 import { harTilgang, kanEndreStatus, kanAvbryteSak } from "@/lib/sak-status";
 
-
 const meldingSchema = z.object({
   sakId: z.string().min(1),
   body: z
@@ -25,15 +24,19 @@ const statusSchema = z.object({
 type Resultat = { ok: true } | { ok: false; error: string };
 
 async function finnBrukerOgSak(sakId: string) {
-  const bruker = await midlertidigBruker(requestInfo.request);
+  const bruker = requestInfo.ctx.user;
   const sak = await hentSak(sakId);
   if (!bruker || !sak || !harTilgang(bruker, sak)) return undefined;
   return { bruker, sak };
 }
 
-export async function sendMelding(sakId: string, body: string): Promise<Resultat> {
+export async function sendMelding(
+  sakId: string,
+  body: string,
+): Promise<Resultat> {
   const parsed = meldingSchema.safeParse({ sakId, body });
-  if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
+  if (!parsed.success)
+    return { ok: false, error: parsed.error.issues[0].message };
 
   const funnet = await finnBrukerOgSak(parsed.data.sakId);
   if (!funnet) return { ok: false, error: "Ingen tilgang til saken" };
@@ -46,7 +49,10 @@ export async function sendMelding(sakId: string, body: string): Promise<Resultat
   return { ok: true };
 }
 
-export async function oppdaterStatus(sakId: string, status: string): Promise<Resultat> {
+export async function oppdaterStatus(
+  sakId: string,
+  status: string,
+): Promise<Resultat> {
   const parsed = statusSchema.safeParse({ sakId, status });
   if (!parsed.success) return { ok: false, error: "Ugyldig status" };
 

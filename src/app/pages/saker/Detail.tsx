@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import type { RequestInfo } from "rwsdk/worker";
-import { midlertidigBruker } from "@/db/queries/bruker";
 import { hentSak } from "@/db/queries/saker";
 import { categoryLabels, priorityLabels, statusLabels } from "@/lib/enums";
 import { harTilgang, kanAvbryteSak, lovligeOverganger } from "@/lib/sak-status";
@@ -11,16 +10,14 @@ import { StatusVelger } from "@/components/StatusVelger";
 
 export async function SakDetalj({
   params,
-  request,
+  ctx,
   response,
 }: RequestInfo<{ id: string }>) {
-  const bruker = await midlertidigBruker(request);
+  const bruker = ctx.user;
   if (!bruker) {
     return (
       <Side>
-        <EmptyState title="Fant ingen bruker">
-          Kjør npm run seed først.
-        </EmptyState>
+        <EmptyState title="Bruker ikke innlogget"></EmptyState>
       </Side>
     );
   }
@@ -49,7 +46,7 @@ export async function SakDetalj({
   }
 
   const erUtleier = bruker.role === "Landlord";
-  const tilbake = `/saker?rolle=${bruker.role}`;
+  const tilbake = `/saker`;
 
   return (
     <Side>

@@ -3,16 +3,16 @@ import { getDb } from "@/db";
 import {
   cases,
   messages,
+  SafeUser,
   type Case,
   type CreateCase,
   type CreateMessage,
-  type User,
 } from "@/db/schema";
 import type { CaseStatus } from "@/lib/enums";
 import type { SakFilter } from "@/lib/sak-filter";
 
 // sakene en bruker får se, nyeste først
-export async function listSaker(bruker: User, filter: SakFilter = {}) {
+export async function listSaker(bruker: SafeUser, filter: SakFilter = {}) {
   const db = await getDb();
   const eier =
     bruker.role === "Landlord"
@@ -28,13 +28,13 @@ export async function listSaker(bruker: User, filter: SakFilter = {}) {
 
 // oppretter sak, sak havner i sakslisten
 export async function createCase(data: CreateCase): Promise<Case> {
-    const db = await getDb();
+  const db = await getDb();
 
   const [newCase] = await db.insert(cases).values(data).returning();
   return newCase;
 }
 export async function hentSak(id: string) {
-    const db = await getDb();
+  const db = await getDb();
 
   return db.query.cases.findFirst({
     where: { id },
@@ -55,7 +55,7 @@ export async function leggTilMelding(data: CreateMessage) {
 }
 
 export async function settStatus(id: string, status: CaseStatus) {
-    const db = await getDb();
+  const db = await getDb();
 
   const [sak] = await db
     .update(cases)
@@ -64,4 +64,3 @@ export async function settStatus(id: string, status: CaseStatus) {
     .returning();
   return sak;
 }
-

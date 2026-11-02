@@ -1,5 +1,4 @@
 import type { RequestInfo } from "rwsdk/worker";
-import { midlertidigBruker } from "@/db/queries/bruker";
 import { listSaker } from "@/db/queries/saker";
 import { parseSakFilter } from "@/lib/sak-filter";
 import {
@@ -10,24 +9,21 @@ import {
 } from "@/lib/enums";
 import { EmptyState } from "@/components/EmptyState";
 import { SakRad } from "@/components/SakRad";
-import { NewCase } from "./NewCase";
-import { user, type UserRole } from "@/db/schema";
+
 // sakslista, filteret er et vanlig skjema med method=get
 
-
-export async function SakerList({ request }: RequestInfo) {
+export async function SakerList({ request, ctx }: RequestInfo) {
   const url = new URL(request.url);
   const filter = parseSakFilter(url.searchParams);
   const harFilter =
     filter.status !== undefined || filter.prioritet !== undefined;
 
-  // midlertidig til innlogging er på plass, velg bruker med ?rolle=landlord
-  const bruker = await midlertidigBruker(request);
+  const bruker = ctx.user;
   if (!bruker) {
     return (
       <main className="mx-auto max-w-4xl p-8 font-sans">
-        <EmptyState title="Fant ingen bruker">
-          Kjør npm run seed først.
+        <EmptyState title="Ikke logget inn">
+          Logg inn for å se sakene dine.
         </EmptyState>
       </main>
     );
@@ -91,7 +87,7 @@ export async function SakerList({ request }: RequestInfo) {
         </button>
 
         {harFilter && (
-          <a className="py-2 underline" href={`/saker?rolle=${rolle}`}>
+          <a className="py-2 underline" href={`/saker`}>
             Nullstill
           </a>
         )}
@@ -119,7 +115,12 @@ export async function SakerList({ request }: RequestInfo) {
           </thead>
           <tbody className="block space-y-3 md:table-row-group md:space-y-0">
             {saker.map((sak) => (
-              <SakRad key={sak.id} sak={sak} rolle={rolle} visLeietaker={erUtleier} />
+              <SakRad
+                key={sak.id}
+                sak={sak}
+                rolle={rolle}
+                visLeietaker={erUtleier}
+              />
             ))}
           </tbody>
         </table>

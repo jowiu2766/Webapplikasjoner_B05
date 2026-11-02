@@ -58,6 +58,7 @@ export function FileUpload({
         name="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
         onChange={handleFileChange}
+        className="text-sm file:cursor-pointer file:rounded-md file:bg-slate-100 file:px-3 file:py-2"
       />
     </div>
   );
