@@ -22,7 +22,7 @@ export function NewCaseForm() {
   const [category, setCategory] = useState<CaseCategory | "choose">("choose");
   const [priority, setPriority] = useState<CasePriority | "choose">("choose");
   const [description, setDescription] = useState("");
-  const [deadline, setDeadLine] = useState(defaultDeadline());
+  const [deadline, setDeadLine] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [fileInputKey, setFileInputKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +37,7 @@ export function NewCaseForm() {
         category,
         priority,
         description,
-        deadline.toISOString(),
+        (deadline ? new Date(deadline) : defaultDeadline()).toISOString(),
       );
 
       if (!result.success) {
@@ -67,7 +67,7 @@ export function NewCaseForm() {
       setCategory("choose");
       setPriority("choose");
       setDescription("");
-      setDeadLine(defaultDeadline());
+      setDeadLine("");
       setFile(null);
       setFileInputKey((k) => k + 1);
     });
@@ -150,9 +150,10 @@ export function NewCaseForm() {
       </label>
       <input
         type="date"
+        value={deadline}
         name="deadline"
         id="deadline"
-        onChange={(e) => setDeadLine(new Date(e.target.value))}
+        onChange={(e) => setDeadLine(e.target.value)}
         className="w-64 rounded-md border border-slate-300 px-3 py-2 cursor-pointer"
       />
       {/* Files - mulig å laste opp flere filer samtidig, men man må markere dem samtidig når de skal lastes opp. 

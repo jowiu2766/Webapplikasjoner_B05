@@ -14,11 +14,26 @@ export const Errors = {
 
 export type ErrorCode = keyof typeof Errors;
 
+export const statusFor: Record<ErrorCode, number> = {
+  BAD_REQUEST: 400,
+  VALIDATION_ERROR: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  METHOD_NOT_ALLOWED: 405,
+  CONFLICT: 409,
+  NOT_UNIQUE: 409,
+  RATE_LIMITED: 429,
+  INTERNAL_SERVER_ERROR: 500,
+  NOT_IMPLEMENTED: 501,
+};
+
 export type Err = {
-    code: ErrorCode;
-    message: string;
-}
+  code: ErrorCode;
+  message: string;
+};
 
 export type ResultError = {
-    success: false; error: Err;
-}
+  success: false;
+  error: Err;
+};

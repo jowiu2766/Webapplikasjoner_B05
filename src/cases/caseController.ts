@@ -1,42 +1,52 @@
 import z from "zod";
 import { caseService, CaseService } from "./caseService";
 import { createCaseSchema } from "./caseSchema";
-import { ErrorCode } from "@/types/errors";
+import type { RequestInfo } from "rwsdk/worker";
+import { statusFor } from "@/types/errors";
 
-export const statusFor: Record<ErrorCode, number> = {
-  BAD_REQUEST: 400,
-  VALIDATION_ERROR: 400,
-  UNAUTHORIZED: 401,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  METHOD_NOT_ALLOWED: 405,
-  CONFLICT: 409,
-  NOT_UNIQUE: 409,
-  RATE_LIMITED: 429,
-  INTERNAL_SERVER_ERROR: 500,
-  NOT_IMPLEMENTED: 501,
-};
-
-// Implementeres senere
 export function createCaseController(caseService: CaseService) {
   return {
     async createCase(ctx: RequestInfo) {
       try {
-        const requestData = await ctx.request.json();
-        const validatedData = createCaseSchema.parse(requestData);
+        const user = ctx.ctx.user;
 
-        const result = await caseService.create(validatedData);
+        if (!user)
+          return Response.json(
+            { error: "Du må være logget inn" },
+            { status: 401 },
+          );
+
+        if (user.role !== "Tenant")
+          return Response.json(
+            { error: "Bare leietakere kan opprette saker" },
+            { status: 403 },
+          );
+
+        const requestData = await ctx.request.json();
+        const parsed = createCaseSchema.safeParse(requestData);
+
+        if (!parsed.success) {
+          return Response.json(
+            {
+              error: "Validation failed",
+              fields: z.flattenError(parsed.error).fieldErrors,
+            },
+            { status: 400 },
+          );
+        }
+
+        const result = await caseService.create(parsed.data, user);
 
         if (!result.success) {
           const { error } = result;
           const { message, code } = error;
           return new Response(JSON.stringify({ error: message }), {
-            statusFor[code]: code || 500,
+            status: statusFor[code],
             headers: { "Content-Type": "application/json" },
           });
         }
 
-        return new Response(JSON.stringify(result), {
+        return new Response(JSON.stringify(result.data), {
           status: 201,
           headers: { "Content-Type": "application/json" },
         });
@@ -46,18 +56,6 @@ export function createCaseController(caseService: CaseService) {
         if (error instanceof SyntaxError) {
           return new Response(
             JSON.stringify({ error: "Invalid JSON in request body" }),
-            {
-              status: 400,
-              headers: { "Content-Type": "application/json" },
-            },
-          );
-        }
-
-        if (error instanceof z.ZodError) {
-          return new Response(
-            JSON.stringify({
-              error: `Validation failed: ${z.flattenError(error).fieldErrors}`,
-            }),
             {
               status: 400,
               headers: { "Content-Type": "application/json" },

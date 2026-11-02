@@ -32,10 +32,9 @@ export async function createCaseAction(
       Errors.FORBIDDEN,
     );
 
-  // Må legge til bedre validering
   if (!validation.success) {
     return ResultHandler.failure(
-      "Valideringsfeil - sjekk kategori og prioritet (de som for øyeblikket må fylles for å sende inn skjema)",
+      validation.error.issues[0].message,
       Errors.VALIDATION_ERROR,
     );
   }

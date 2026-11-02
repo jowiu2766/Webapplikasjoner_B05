@@ -15,8 +15,8 @@ export function createCaseService(caseRepository: CaseRepository): CaseService {
       try {
         return await caseRepository.create({
           ...input,
-          tenantId: user.id && user.role == "Tenant",
-          landlordId: user.id && user.role == "Landlord",
+          tenantId: user.id,
+          landlordId: user.id,
         });
       } catch (error) {
         console.error("Error creating case:", error);

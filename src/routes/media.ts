@@ -4,21 +4,12 @@ import { env } from "cloudflare:workers";
 import { getDb } from "@/db";
 import { eq } from "drizzle-orm";
 import { route } from "rwsdk/router";
+import { harTilgang } from "@/lib/sak-status";
 
 // Post
 export const fileUploadRoute = route(
   "/api/saker/:caseId/fil",
   async ({ request, ctx, params }) => {
-    if (request.method !== "POST") {
-      return new Response("Method Not Allowed", { status: 405 });
-    }
-    if (!ctx.session || ctx.session.userId !== params.userId) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-    if (!env.R2) {
-      return Response.json({ error: "storage-unavailable" }, { status: 503 });
-    }
-
     const db = await getDb();
     const formData = await request.formData();
     const result = await storeUpload(
@@ -28,6 +19,26 @@ export const fileUploadRoute = route(
       "files",
       params.caseId,
     );
+    const sak = await db.query.cases.findFirst({
+      where: { id: params.caseId },
+    });
+
+    if (request.method !== "POST") {
+      return new Response("Method Not Allowed", { status: 405 });
+    }
+    if (!ctx.user)
+      return Response.json({ error: "Du må være logget inn" }, { status: 401 });
+    if (!sak)
+      return Response.json({ error: "Fant ikke saken" }, { status: 404 });
+    if (!harTilgang(ctx.user, sak))
+      return Response.json(
+        { error: "Ingen tilgang til saken" },
+        { status: 403 },
+      );
+    if (!env.R2) {
+      return Response.json({ error: "storage-unavailable" }, { status: 503 });
+    }
+
     if (!result.ok) {
       return Response.json({ error: result.error.message }, { status: 400 });
     }

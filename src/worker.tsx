@@ -21,6 +21,7 @@ import {
 import { fileUploadRoute, mediaRoute } from "./routes/media";
 import LoginPage from "@/components/auth/pages/LoginPage";
 import RegisterPage from "@/components/auth/pages/RegisterPage";
+import { caseRoutes } from "./cases/caseRoutes";
 
 /**
  * Alt som ligger på `ctx` for én forespørsel.
@@ -53,6 +54,7 @@ const app = defineApp([
   route("/api/status", () => Response.json({ status: "ok", version: "0.1.0" })),
   fileUploadRoute,
   mediaRoute,
+  caseRoutes,
 
   // Sider. render(Document, [...]) pakker dem i et helt HTML-dokument.
   render(Document, [
@@ -60,16 +62,15 @@ const app = defineApp([
       route("/", Home),
 
       //Login & registering
-      route("/auth/login", [redirectIfAuthenticated, LoginPage ]),
-      route("/auth/register",[redirectIfAuthenticated, RegisterPage ]),
-
+      route("/auth/login", [redirectIfAuthenticated, LoginPage]),
+      route("/auth/register", [redirectIfAuthenticated, RegisterPage]),
 
       //Krever innloging, uten innloding sened dil til /auth/login
-      route("/saker",  [reqAuthorization(), SakerList]),
-      route("/saker/ny",  [reqAuthorization(), NewCase]),
+      route("/saker", [reqAuthorization(), SakerList]),
+      route("/saker/ny", [reqAuthorization(), NewCase]),
       // etter /saker/ny, ellers tolkes «ny» som en id
-      route("/saker/:id",  [reqAuthorization(), SakDetalj]),
-      ]),
+      route("/saker/:id", [reqAuthorization(), SakDetalj]),
+    ]),
   ]),
 ]);
 
