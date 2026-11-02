@@ -1,7 +1,6 @@
 import z from "zod";
 import { caseCategories, casePriorities } from "@/lib/enums";
 
-//legger til deadline og filer senere, database må tilpasses for dem
 export const createCaseSchema = z.object({
   title: z.string(),
   category: z.enum(caseCategories),

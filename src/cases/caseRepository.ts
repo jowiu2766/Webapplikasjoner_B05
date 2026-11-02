@@ -8,7 +8,6 @@ import { Result } from "@/types/result";
 export interface CaseRepository {
   create(data: CreateCase): Promise<Result<Case>>;
 }
-const db = await getDb();
 
 export function createCaseRepository(
   getDatabase: () => Promise<DB> = getDb,

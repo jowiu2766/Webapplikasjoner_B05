@@ -12,6 +12,9 @@ export const fileUploadRoute = route(
     if (request.method !== "POST") {
       return new Response("Method Not Allowed", { status: 405 });
     }
+    if (!ctx.session || ctx.session.userId !== params.userId) {
+      return new Response("Unauthorized", { status: 401 });
+    }
     if (!env.R2) {
       return Response.json({ error: "storage-unavailable" }, { status: 503 });
     }

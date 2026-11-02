@@ -6,8 +6,8 @@ import { caseService } from "./caseService";
 import type { Case } from "@/db/schema";
 import { Result } from "@/types/result";
 import { Errors } from "@/types/errors";
+import { requestInfo } from "rwsdk/worker";
 
-// Må legge til deadline og filer her
 export async function createCaseAction(
   title: string,
   category: string,
@@ -22,6 +22,15 @@ export async function createCaseAction(
     description,
     deadline,
   });
+  const user = requestInfo.ctx.user;
+
+  if (!user)
+    return ResultHandler.failure("Du må være logget inn", Errors.UNAUTHORIZED);
+  if (user.role !== "Tenant")
+    return ResultHandler.failure(
+      "Bare leietakere kan opprette saker",
+      Errors.FORBIDDEN,
+    );
 
   // Må legge til bedre validering
   if (!validation.success) {
@@ -31,5 +40,5 @@ export async function createCaseAction(
     );
   }
 
-  return caseService.create(validation.data);
+  return caseService.create(validation.data, user);
 }
