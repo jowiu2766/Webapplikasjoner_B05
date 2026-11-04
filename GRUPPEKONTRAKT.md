@@ -47,7 +47,7 @@ Se [KI-AVTALE.md](KI-AVTALE.md).
 
 ## Tematikk
 
-Fiksa: dialogen mellom leietaker og utleier på ett sted. Se [docs/produkt.md](docs/produkt.md).
+Fiksa: dialogen mellom leietaker og utleier på ett sted. Se [README.md](README.md).
 
 ## Hvis noen ikke bidrar
 

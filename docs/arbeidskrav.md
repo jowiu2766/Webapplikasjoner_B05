@@ -54,7 +54,6 @@ Lyntale (trukket uke fra uke 37) og retrospekt (trekkes i timen) kommer i tilleg
 
 Deploy til Cloudflare er anbefalt, ikke et krav.
 
-Status i repoet nå: stack, Drizzle/D1 med lokal database, Vitest med dekning, README og CI er på plass. Tabellene i `src/db/schema/` er eksempler fra starteren og skal byttes ut med vår egen datamodell. Dekningen med eksempeltestene er rundt 20 %; kravet er 50 % ved innlevering.
 
 ## Hva som vurderes
 

@@ -62,5 +62,5 @@ får kjøre installasjonsscript. Uten dem starter ikke utviklingsserveren.
 
 Dette repoet er webappen til Fiksa (gruppe B05). Mobilappen ligger i et eget
 repo. Gruppen skriver feature-koden selv, se `KI-AVTALE.md` for hva KI brukes
-til. Kravene står i `docs/arbeidskrav.md`, produktidéen i `docs/produkt.md`,
-hosting i `docs/hosting.md`.
+til. Kravene står i `docs/arbeidskrav.md`, arkitekturen og datamodellen i
+`docs/arkitektur.md`, hosting i `docs/hosting.md`.
