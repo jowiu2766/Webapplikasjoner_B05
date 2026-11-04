@@ -15,13 +15,13 @@
   // Statiske filer fra public/. rwsdk forventer at bindingen finnes.
   "assets": {
     "binding": "ASSETS",
-    "directory": "public"
+    "directory": "public",
   },
 
   // Logger hver request, så `wrangler tail` viser hele bildet.
   "observability": {
     "enabled": true,
-    "head_sampling_rate": 1
+    "head_sampling_rate": 1,
   },
 
   // Offentlige variabler. Alle som når workeren kan lese dem, så ingenting
@@ -39,9 +39,9 @@
       "migrations_dir": "drizzle/migrations",
       // Drizzle v1 legger hver migrasjon i sin egen mappe. Uten dette
       // mønsteret finner wrangler ingenting, og sier «No migrations to apply».
-      "migrations_pattern": "drizzle/migrations/*/migration.sql"
-    }
-  ]
+      "migrations_pattern": "drizzle/migrations/*/migration.sql",
+    },
+  ],
 
   // Workers AI. Har ingen lokal emulering, så kallet går alltid til
   // Cloudflare. Husk `npm run generate` etter at dere slår den på.
@@ -51,5 +51,11 @@
   // "triggers": { "crons": ["0 7 * * *"] },
 
   // Objektlagring for filer og bilder.
-  // "r2_buckets": [{ "binding": "R2", "bucket_name": "webapp-files" }]
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "fiksa-files",
+      "preview_bucket_name": "fiksa-files-dev",
+    },
+  ],
 }

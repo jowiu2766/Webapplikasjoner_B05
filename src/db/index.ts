@@ -1,26 +1,52 @@
-import { drizzle } from "drizzle-orm/d1";
+import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import type { SQLiteAsyncDatabase } from "drizzle-orm/sqlite-core";
+import { defineRelations } from "drizzle-orm";
 import { env } from "cloudflare:workers";
 import * as schema from "./schema";
 import { relations } from "./relations";
 
-/**
- * Én Drizzle-klient mot D1.
- *
- * I Drizzle v1 sendes `relations` inn her, ikke `schema`. Tabellene leses ut
- * av relasjonsobjektet.
- *
- * Klienten lages på modulnivå, og det er trygt: `env` er request-scopet bak
- * kulissene. Det som IKKE er trygt, er å legge noe som gjelder én bruker, som
- * en sesjon, i en modulvariabel. Da deles den mellom alle.
- */
-export const db = drizzle(env.DB, { relations });
-
 export { schema, relations };
 
-/**
- * Databasetype uten binding til driver. Både D1 i produksjon og
- * better-sqlite3 i testene er `SQLiteAsyncDatabase`, så den samme koden kjører
- * mot begge. Det er dette som gjør det mulig å teste spørringer raskt.
- */
-export type DB = SQLiteAsyncDatabase<any, any, typeof relations>;
+
+
+
+let dbInstance: DB  |null = null;
+
+async function getWorkerEnv(): Promise<D1Database>{
+    try{
+        const {env} = await import("cloudflare:workers");
+
+        if(!env || !env.DB){
+            throw new Error("D1 database instance not found in worker enviroment");
+        }
+        return env.DB as D1Database;        
+    }catch(error){
+        throw new Error("Failed to get D1 databsae instance from wokrer enviroment");
+    }
+}
+//Factory fucntion that accepts a D1 databse instnace
+export function createDatabase(d1Database: D1Database){
+    if (!d1Database){
+        throw new Error("D1 Databse is required");
+    }
+    return drizzle(d1Database, {relations});
+}
+
+//Setup database with Provided D1 instance
+export function setupDb(d1Database: D1Database){
+    if(dbInstance){
+        return dbInstance;
+    }
+    dbInstance = createDatabase(d1Database);
+    return dbInstance;
+}
+
+
+export async function getDb(): Promise<DB> {
+    if(!dbInstance){
+        dbInstance = createDatabase(await getWorkerEnv());
+    }
+    return dbInstance;
+}
+
+export type DB = ReturnType<typeof createDatabase>;

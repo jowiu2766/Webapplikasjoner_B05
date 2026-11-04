@@ -1,5 +1,5 @@
-import type { CaseStatus, UserRole } from "./enums";
-
+import type { CaseStatus } from "./enums";
+import type { UserRole } from "@/db/schema";
 // overgangene fra docs/arkitektur.md
 const nesteSteg: Partial<Record<CaseStatus, CaseStatus>> = {
   open: "in_progress",
@@ -9,7 +9,7 @@ const nesteSteg: Partial<Record<CaseStatus, CaseStatus>> = {
 };
 
 export function lovligeOverganger(fra: CaseStatus, rolle: UserRole): CaseStatus[] {
-  if (rolle === "landlord") {
+  if (rolle === "Landlord") {
     const neste = nesteSteg[fra];
     return neste ? [neste] : [];
   }
@@ -21,12 +21,12 @@ export function kanEndreStatus(fra: CaseStatus, til: CaseStatus, rolle: UserRole
 }
 
 export function kanAvbryteSak(status: CaseStatus, rolle: UserRole) {
-  return rolle === "tenant" && status === "open";
+  return rolle === "Tenant" && status === "open";
 }
 
 export function harTilgang(
-  bruker: { id: number },
-  sak: { tenantId: number; landlordId: number }
+  bruker: { id: string },
+  sak: { tenantId: string; landlordId: string }
 ) {
   return bruker.id === sak.tenantId || bruker.id === sak.landlordId;
 }

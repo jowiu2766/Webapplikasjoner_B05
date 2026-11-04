@@ -1,14 +1,21 @@
 import { eq } from "drizzle-orm";
-import { db } from "@/db";
-import { cases, messages } from "@/db/schema";
-import type { CreateMessage, User } from "@/db/schema";
+import { getDb } from "@/db";
+import {
+  cases,
+  messages,
+  SafeUser,
+  type Case,
+  type CreateCase,
+  type CreateMessage,
+} from "@/db/schema";
 import type { CaseStatus } from "@/lib/enums";
 import type { SakFilter } from "@/lib/sak-filter";
 
 // sakene en bruker får se, nyeste først
-export function listSaker(bruker: User, filter: SakFilter = {}) {
+export async function listSaker(bruker: SafeUser, filter: SakFilter = {}) {
+  const db = await getDb();
   const eier =
-    bruker.role === "landlord"
+    bruker.role === "Landlord"
       ? { landlordId: bruker.id }
       : { tenantId: bruker.id };
 
@@ -19,7 +26,16 @@ export function listSaker(bruker: User, filter: SakFilter = {}) {
   });
 }
 
-export function hentSak(id: string) {
+// oppretter sak, sak havner i sakslisten
+export async function createCase(data: CreateCase): Promise<Case> {
+  const db = await getDb();
+
+  const [newCase] = await db.insert(cases).values(data).returning();
+  return newCase;
+}
+export async function hentSak(id: string) {
+  const db = await getDb();
+
   return db.query.cases.findFirst({
     where: { id },
     with: {
@@ -33,11 +49,14 @@ export function hentSak(id: string) {
 export type SakMedMeldinger = NonNullable<Awaited<ReturnType<typeof hentSak>>>;
 
 export async function leggTilMelding(data: CreateMessage) {
+  const db = await getDb();
   const [melding] = await db.insert(messages).values(data).returning();
   return melding;
 }
 
 export async function settStatus(id: string, status: CaseStatus) {
+  const db = await getDb();
+
   const [sak] = await db
     .update(cases)
     .set({ status })
