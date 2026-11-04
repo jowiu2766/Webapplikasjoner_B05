@@ -31,7 +31,6 @@ export async function SakerList({ request, ctx }: RequestInfo) {
 
   const erUtleier = bruker.role === "Landlord";
   const saker = await listSaker(bruker, filter);
-  const rolle = bruker.role;
 
   const selectClass = "mt-1 rounded-md border border-slate-300 px-3 py-2";
 
@@ -46,7 +45,6 @@ export async function SakerList({ request, ctx }: RequestInfo) {
         method="get"
         className="mt-6 flex flex-wrap items-end gap-3 text-sm"
       >
-        {/* rollen blir med når skjemaet sendes */}
         <label className="flex flex-col">
           Status
           <select
@@ -118,7 +116,6 @@ export async function SakerList({ request, ctx }: RequestInfo) {
               <SakRad
                 key={sak.id}
                 sak={sak}
-                rolle={rolle}
                 visLeietaker={erUtleier}
               />
             ))}
