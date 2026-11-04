@@ -43,7 +43,6 @@ export function LoginForm() {
       <div className="w-full max-w-md mx-auto">
       <div className="bg-white rounded-lg shadow-lg p-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Login</h1>
-        <p>{JSON.stringify(state)}</p>
 
         {!state.success && state.error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
