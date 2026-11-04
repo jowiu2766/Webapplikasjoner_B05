@@ -16,7 +16,10 @@ Satt opp 16. september 2026. Appen ligger på https://fiksa.hiof-b05.workers.dev
    ```bash
    npx wrangler login
    npx wrangler d1 create fiksa-db
+   npx wrangler r2 bucket create fiksa-files
    ```
+
+   Bøtta for bilder krever at R2 er slått på i dashbordet først (R2 Object Storage, «Enable R2»). Uten bøtta feiler deploy med «R2 bucket 'fiksa-files' not found».
 
    Svaret inneholder en `database_id`. Lim den inn i `wrangler.jsonc` der det står `__change_me__`, og commit. Uten den feiler deploy.
 3. **API-token.** Cloudflare-dashbordet, My Profile, API Tokens, Create Token. Bruk malen «Edit Cloudflare Workers» og legg til `D1: Edit` under Account. Kopier tokenet med en gang, det vises bare én gang.
@@ -47,6 +50,7 @@ Lokalt ligger de samme verdiene i `.dev.vars` (gitignorert), se `.dev.vars.examp
 | Deploy | push til `main`. Actions-fanen viser status |
 | Deploy for hånd | `npm run release` (bygger og kjører `wrangler deploy` lokalt) |
 | Ny migrasjon i skyen | kjøres av deploy-workflowen. For hånd: `npm run migrate:prod` |
+| Testdata i skyen | `npm run seed:prod`. Tømmer brukere, saker og meldinger først, så bare til demo |
 | Logger fra produksjon | `npx wrangler tail` |
 | Slette og starte på nytt | `npx wrangler d1 delete fiksa-db`, så steg 2 på nytt |
 

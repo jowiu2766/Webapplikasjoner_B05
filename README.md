@@ -43,10 +43,17 @@ npm run seed           # to brukere og fire saker
 npm run dev
 ```
 
-Åpne `http://localhost:5173` og logg inn med en av dem:
+Åpne `http://localhost:5173` og logg inn på `/auth/login`. Du logger inn med
+brukernavn, ikke e-post:
 
-- kari@fiksa.no / Kari1234 (leietaker)
-- ola@fiksa.no / Ola12345 (utleier)
+| Rolle | Brukernavn | Passord |
+| --- | --- | --- |
+| Leietaker | `kari_leietaker` | `Kari1234` |
+| Utleier | `ola_utleier` | `Ola12345` |
+
+De to hører sammen: Karis fire saker er sendt til Ola, og den første saken har
+to meldinger. `npm run seed:prod` legger de samme brukerne og sakene inn i
+databasen i skyen, så de kan brukes på adressen over også.
 
 Eller registrer en ny bruker på `/auth/register`. Der velger du rolle, og
 adressefeltet søker i Kartverkets adresse-API mens du skriver, så det trenger
@@ -138,19 +145,31 @@ sjekker rollen før de rører databasen.
 | `npm run migrate:dev` | kjører migrasjonene mot den lokale databasen |
 | `npm run migrate:prod` | kjører dem mot databasen i skyen |
 | `npm run seed` | legger inn testdata |
+| `npm run seed:prod` | legger de samme testdataene inn i databasen i skyen |
 | `npm run generate` | oppdaterer typene etter endring i `wrangler.jsonc` |
 | `npm run build` | bygger for produksjon |
 | `npm run release` | bygger og deployer for hånd |
 
 ## Innlogging og lagring
 
-Innlogging er better-auth med e-post og passord. Tabellene `user`, `session`,
-`account` og `verification` er better-auth sine, og vi har lagt `role`
-(`Tenant` eller `Landlord`) og `address` på `user` i stedet for å lage en egen
-brukertabell. Middlewaren i `src/middelWare/Authentication.ts` leser sesjonen
-fra cookien på hver forespørsel og setter `ctx.user`, så både server-komponenter
-og server actions vet hvem som spør. Rutene under `/saker` sender deg til
-`/auth/login` om du ikke er logget inn.
+Innlogging er vår egen, med brukernavn og passord. Fra better-auth bruker vi
+bare passord-hashingen (`better-auth/crypto`) og tabellene i skjemaet, ikke
+innloggingsflyten. Slik henger det sammen:
+
+- `/auth/register` lager en rad i `user` med `name` (brukernavnet du logger inn
+  med), `email`, `password_hash`, `role` (`Tenant` eller `Landlord`) og
+  `address`. Passordet må ha minst 8 tegn, stor og liten bokstav og et tall.
+- `/auth/login` slår opp på brukernavn, sjekker passordet mot hashen og lager en
+  rad i `session` som varer i sju dager. Sesjons-id-en ligger i cookien
+  `fika_session_cookie`.
+- Middlewaren i `src/middelWare/Authentication.ts` leser cookien på hver
+  forespørsel og setter `ctx.user`, så server-komponenter og server actions vet
+  hvem som spør. `Authorization.ts` sender deg til `/auth/login` om du ikke er
+  logget inn, og har `requireRole` for ruter som krever en bestemt rolle.
+- Tabellene `account` og `verification` ligger i skjemaet, men brukes ikke.
+
+Koden ligger i `src/api/auth/` (service, repository og server actions) og
+`src/lib/auth/` (passord, sesjon og roller).
 
 Databasen er **D1**, som er SQLite hos Cloudflare. Sakene ligger i `cases`,
 meldingene i `messages`. Bilder ligger i R2, bare nøkkelen lagres på saken.
