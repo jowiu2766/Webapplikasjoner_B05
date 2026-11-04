@@ -58,7 +58,7 @@ describe("validateDeadline", () => {
   });
 
   it("avviser en frist i fortiden", () => {
-    expect(validateDeadline("2020-01-01").ok).toEqual(false);
+    expect(validateDeadline(new Date("2020-01-01")).ok).toEqual(false);
   });
 });
 

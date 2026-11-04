@@ -2,7 +2,6 @@
 
 import { requestInfo } from "rwsdk/worker";
 import { z } from "zod";
-import { midlertidigBruker } from "@/db/queries/bruker";
 import { hentSak, leggTilMelding, settStatus } from "@/db/queries/saker";
 import { caseStatuses } from "@/lib/enums";
 import { harTilgang, kanEndreStatus, kanAvbryteSak } from "@/lib/sak-status";

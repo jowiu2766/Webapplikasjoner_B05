@@ -1,26 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { db } from "@/db";
-import { cases, messages, users } from "@/db/schema";
+import { cases, messages } from "@/db/schema";
 import { hentSak, leggTilMelding, listSaker, settStatus } from "../saker";
-import { seedParter, tomDb } from "@/test/db";
+import { frist, nyBruker, seedParter, tomDb } from "@/test/db";
 
-vi.mock("@/db", async () => ({ db: (await import("@/test/db")).lagTestDb() }));
+const db = await vi.hoisted(async () => (await import("@/test/db")).lagTestDb());
+vi.mock("@/db", () => ({ getDb: async () => db }));
 
 describe("listSaker", () => {
   beforeEach(() => tomDb(db));
 
   it("en sak som meldes inn finnes igjen hos leietakeren og utleieren, ingen andre", async () => {
     const { leietaker, utleier } = await seedParter(db);
-    const [annenUtleier] = await db
-      .insert(users)
-      .values({ name: "Per Utleier", email: "per@example.com", role: "landlord" })
-      .returning();
+    const annenUtleier = await nyBruker(db, { name: "Per Utleier", email: "per@example.com", role: "Landlord" });
 
     await db.insert(cases).values({
       title: "Vannlekkasje under kjøkkenvasken",
       description: "Det drypper fra røret under vasken.",
       category: "pipes",
       priority: "high",
+      deadline: frist,
       tenantId: leietaker.id,
       landlordId: utleier.id,
     });
@@ -37,7 +35,7 @@ describe("listSaker", () => {
 
   it("filtrerer på status og prioritet", async () => {
     const { leietaker, utleier } = await seedParter(db);
-    const felles = { description: "x", tenantId: leietaker.id, landlordId: utleier.id };
+    const felles = { description: "x", deadline: frist, tenantId: leietaker.id, landlordId: utleier.id };
     await db.insert(cases).values([
       { ...felles, title: "Åpen og høy", category: "pipes", priority: "high", status: "open" },
       { ...felles, title: "Lukket og høy", category: "pests", priority: "high", status: "closed" },
@@ -56,7 +54,7 @@ describe("listSaker", () => {
   it("nyeste sak først", async () => {
     const { leietaker, utleier } = await seedParter(db);
     const dag = 86_400_000;
-    const felles = { description: "x", category: "other", priority: "low", tenantId: leietaker.id, landlordId: utleier.id } as const;
+    const felles = { description: "x", category: "other", priority: "low", deadline: frist, tenantId: leietaker.id, landlordId: utleier.id } as const;
     await db.insert(cases).values([
       { ...felles, title: "Gammel", createdAt: new Date(Date.now() - 3 * dag) },
       { ...felles, title: "Ny", createdAt: new Date() },
@@ -75,7 +73,7 @@ describe("hentSak", () => {
     const { leietaker, utleier } = await seedParter(db);
     const [sak] = await db
       .insert(cases)
-      .values({ title: "Vannlekkasje", description: "x", category: "pipes", priority: "high", tenantId: leietaker.id, landlordId: utleier.id })
+      .values({ title: "Vannlekkasje", description: "x", category: "pipes", priority: "high", deadline: frist, tenantId: leietaker.id, landlordId: utleier.id })
       .returning();
     await db.insert(messages).values([
       { caseId: sak.id, senderId: leietaker.id, body: "Nyeste", createdAt: new Date("2026-10-22T12:00:00Z") },
@@ -102,7 +100,7 @@ describe("leggTilMelding og settStatus", () => {
     const { leietaker, utleier } = await seedParter(db);
     const [sak] = await db
       .insert(cases)
-      .values({ title: "Vannlekkasje", description: "x", category: "pipes", priority: "high", tenantId: leietaker.id, landlordId: utleier.id })
+      .values({ title: "Vannlekkasje", description: "x", category: "pipes", priority: "high", deadline: frist, tenantId: leietaker.id, landlordId: utleier.id })
       .returning();
 
     const melding = await leggTilMelding({ caseId: sak.id, senderId: utleier.id, body: "På vei" });
